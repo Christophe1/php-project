@@ -27,42 +27,36 @@ if (isset($_POST['create'])) {
 	$phonenumber = ($_POST['phonenumber']);
 	$address = ($_POST['address']);
 	$comment = ($_POST['comment']);
-	//check if the category being entered is already there
-	$check="SELECT COUNT(*) FROM category WHERE cat_name = '$_POST[category]'";
-$get_value = mysqli_query($con,$check);
-//check the number of values of the category being posted
-$data = mysqli_fetch_array($get_value, MYSQLI_NUM);
-//if the category name already exists in the category table
-if($data[0] >= 1) {
-    echo "This Already Exists<br/>";
-}
-
-else if ($data[0] < 1)
+	
+	$check="SELECT COUNT(*) FROM category WHERE cat_name = '$_POST['category]'";
+if (mysqli_query($con,$check)>=1)
 {
-	//if it's not in there, then add the category in the category table.
-$sql = "INSERT INTO category VALUES(NULL, '{$category}', '$user_id')";
-$rs1=mysqli_query($con, $sql); 
-$rs2=mysqli_query($con, $sql);
-//$sql = ("INSERT INTO category VALUES(NULL, '{$category}', '$user_id')"); ("INSERT INTO review VALUES(NULL,'22','bobby','$user_id', 'bobby','bobby','bobby', '1')");
+    echo "User Already in Exists<br/>";
+}
+	
+	
+	$sql = "INSERT INTO category VALUES(NULL, '{$category}', '$user_id')";
 
-//$sql2 = "INSERT INTO review VALUES(NULL,'222','{$category}','$user_id', '{$name}','{$phonenumber}','{$address}', '{$comment}')";
-//$rs2=mysqli_query($con, $sql2);
-//$sql = "INSERT INTO review VALUES(NULL,'22','bobby','$user_id', 'bobby','bobby','bobby', '1')";
-//echo "this come up twice?";
+//in the review table, create a new id, put in the cat_id it comes under, the user id...
+	//$sql2 = "INSERT INTO review(review_id, cat_id) VALUES(NULL,'456')";
 
+//	$sql2 = "INSERT INTO review VALUES(NULL,'22','bobby','$user_id', 'bobby','bobby','bobby', '1')";
+
+//	$sql2 = "INSERT INTO review VALUES(NULL,'222','{$category}','$user_id', '{$name}','{$phonenumber}','{$address}', '{$comment}')";
+
+	
 		if ($con->query($sql) === TRUE) {
-echo "Yes, it's been added correctly";
-
+echo "successse";
 	//header('Location:volleyLogin.php');
 
 	} else {
 	echo "Error: " . $sql . "<br>" . $con->error;
 }
+//echo "done";
+}
 
-}
-$con->close();
-}
-	
+
+	$con->close();
 
 
 ?>
