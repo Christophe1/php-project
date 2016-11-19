@@ -28,36 +28,50 @@ if (isset($_POST['create'])) {
 	$address = ($_POST['address']);
 	$comment = ($_POST['comment']);
 	//check if the category being entered is already there
-	$check="SELECT COUNT(*) FROM category WHERE cat_name = '$_POST[category]'";
-$get_value = mysqli_query($con,$check);
+	$select_from_cat_table = "SELECT COUNT(*) FROM category WHERE cat_name = '$_POST[category]'";
+	$get_cat_value = mysqli_query($con, $select_from_cat_table);
 //check the number of values of the category being posted
-$data = mysqli_fetch_array($get_value, MYSQLI_NUM);
-//if the category name already exists in the category table
-if($data[0] >= 1) {
+	$data = mysqli_fetch_array($get_cat_value, MYSQLI_NUM);
+	
+	
+	
+//if the category name already exists in the category table, then don't add it in again
+	if($data[0] >= 1) {
     echo "This Already Exists<br/>";
+	//but do add it to the review table
+	$insert_review_command = "INSERT INTO review VALUES(NULL,'222','{$category}','$user_id', '{$name}','{$phonenumber}','{$address}', '{$comment}')";
+    $insert_into_review_table = mysqli_query($con,$insert_review_command);
+	
 }
 
 else if ($data[0] < 1)
 {
 	//if it's not in there, then add the category in the category table.
-$sql = "INSERT INTO category VALUES(NULL, '{$category}', '$user_id')";
-$rs1=mysqli_query($con, $sql); 
-$rs2=mysqli_query($con, $sql);
+	$insert_category_command = "INSERT INTO category VALUES(NULL, '{$category}', '$user_id')";
+    $insert_into_category_table = mysqli_query($con,$insert_category_command);
+
+	
+	//and add it to the review table
+	$insert_review_command = "INSERT INTO review VALUES(NULL,'222','{$category}','$user_id', '{$name}','{$phonenumber}','{$address}', '{$comment}')";
+    $insert_into_review_table = mysqli_query($con,$insert_review_command);
+
+//$rs1=mysqli_query($con, $sql); 
+
 //$sql = ("INSERT INTO category VALUES(NULL, '{$category}', '$user_id')"); ("INSERT INTO review VALUES(NULL,'22','bobby','$user_id', 'bobby','bobby','bobby', '1')");
 
 //$sql2 = "INSERT INTO review VALUES(NULL,'222','{$category}','$user_id', '{$name}','{$phonenumber}','{$address}', '{$comment}')";
 //$rs2=mysqli_query($con, $sql2);
 //$sql = "INSERT INTO review VALUES(NULL,'22','bobby','$user_id', 'bobby','bobby','bobby', '1')";
-//echo "this come up twice?";
 
-		if ($con->query($sql) === TRUE) {
+
+	//	if ($con->query($sql) === TRUE) {
 echo "Yes, it's been added correctly";
 
 	//header('Location:volleyLogin.php');
 
-	} else {
+/* 	} else {
 	echo "Error: " . $sql . "<br>" . $con->error;
-}
+} */
 
 }
 $con->close();
