@@ -7,15 +7,15 @@
 	echo "user name is " . $username . "<br>";
 	echo "user id is " . $user_id . "<br>"; 
 	
-/* 	//select everything from user
-	$sql = "SELECT * FROM user WHERE username = '$username'";
+	//get the row in the category table 
+	//$sql = "SELECT * FROM category WHERE user_id = '$user_id'";
 //get the result of the above
-	$result = mysqli_query($con,$sql);
+	//$result = mysqli_query($con,$sql);
 //get every other record in the same row 
-	$row = mysqli_fetch_assoc($result);
+	//$row = mysqli_fetch_assoc($result);
 //make the user_id record in that row a variable 
-	$user_id = $row["user_id"];
-	//$cat_id = $row["cat_id"]; */
+	//$user_id = $row["user_id"];
+	//$cat_id = $row["cat_id"]; 
 
 if (isset($_POST['create'])) {
 	
@@ -33,12 +33,21 @@ if (isset($_POST['create'])) {
 //check the number of values of the category being posted
 	$data = mysqli_fetch_array($get_cat_value, MYSQLI_NUM);
 	
-	
-	
+   //get the matching cat_id 
+	   $row = mysqli_fetch_assoc($get_cat_value)
+        echo $row["cat_id"];
+		echo "testing";
+  //      echo $row["fullname"];
+  //      echo $row["userstatus"];
+    }
+     echo "testing2";
+	//echo $cat_id;
 //if the category name already exists in the category table, then don't add it in again
 	if($data[0] >= 1) {
     echo "This Already Exists<br/>";
 	//but do add it to the review table
+	//for the cat_id, we want to get the cat_id of the category name that already exists, that has 
+	//just been posted. how do we do this ?
 	$insert_review_command = "INSERT INTO review VALUES(NULL,'222','{$category}','$user_id', '{$name}','{$phonenumber}','{$address}', '{$comment}')";
     $insert_into_review_table = mysqli_query($con,$insert_review_command);
 	
@@ -67,13 +76,15 @@ else if ($data[0] < 1)
 	//	if ($con->query($sql) === TRUE) {
 echo "Yes, it's been added correctly";
 
-	//header('Location:volleyLogin.php');
+//	header('Location:volleyLogin.php');
 
 /* 	} else {
 	echo "Error: " . $sql . "<br>" . $con->error;
 } */
 
 }
+
+
 $con->close();
 }
 	
