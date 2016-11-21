@@ -28,18 +28,18 @@ if (isset($_POST['create'])) {
 	$address = ($_POST['address']);
 	$comment = ($_POST['comment']);
 	//check if the category being entered is already there
-	$select_from_cat_table = "SELECT COUNT(*) FROM category WHERE cat_name = '$_POST[category]'";
+	$select_from_cat_table = "SELECT cat_name FROM category WHERE cat_name = '$_POST[category]'";
 	$get_cat_value = mysqli_query($con, $select_from_cat_table);
 //check the number of values of the category being posted
 	$data = mysqli_fetch_array($get_cat_value, MYSQLI_NUM);
 	
    //get the matching cat_id 
-	   $row = mysqli_fetch_assoc($get_cat_value)
-        echo $row["cat_id"];
-		echo "testing";
+	  // $row = mysqli_fetch_assoc($get_cat_value)
+      //  echo $row["cat_id"];
+		//echo "testing";
   //      echo $row["fullname"];
   //      echo $row["userstatus"];
-    }
+    
      echo "testing2";
 	//echo $cat_id;
 //if the category name already exists in the category table, then don't add it in again
@@ -53,7 +53,8 @@ if (isset($_POST['create'])) {
 	
 }
 
-else if ($data[0] < 1)
+else if ($data[0] < 1) 
+	
 {
 	//if it's not in there, then add the category in the category table.
 	$insert_category_command = "INSERT INTO category VALUES(NULL, '{$category}', '$user_id')";
