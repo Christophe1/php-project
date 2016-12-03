@@ -8,8 +8,8 @@
   <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
   <script>
   $(function() {
-    $( "#search_category" ).autocomplete({
-      source: 'search1.php'
+    $( "#skills" ).autocomplete({
+      source: 'search.php'
     });
   });
   </script>
@@ -17,8 +17,8 @@
 <body>
  
 <div class="ui-widget">
-  <label for="search_category">Search: </label>
-  <input id="search_category">
+  <label for="skills">Skills: </label>
+  <input id="skills">
 </div>
 </body>
 </html>

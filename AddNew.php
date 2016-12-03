@@ -34,7 +34,8 @@ if (isset($_POST['create'])) {
 	
 	  // get the matching cat_id 
 	   $row = mysqli_fetch_assoc($result);
-       echo $row["cat_id"];
+       $cat_id = $row["cat_id"];
+	  // echo $cat_id;
 	
 	//$get_cat_value = mysqli_query($con, $select_from_cat_table);
 //check the number of values of the category being posted
@@ -47,15 +48,15 @@ if (isset($_POST['create'])) {
   //      echo $row["fullname"];
   //      echo $row["userstatus"];
     
-     echo "testing2";
+   //  echo "testing2";
 	//echo $cat_id;
 //if the category name already exists in the category table, then don't add it in again
 	if($num_rows >= 1) {
     echo "This Already Exists<br/>";
 	//but do add it to the review table
 	//for the cat_id, we want to get the cat_id of the category name that already exists, that has 
-	//just been posted. how do we do this ?
-	$insert_review_command = "INSERT INTO review VALUES(NULL,'222','{$category}','$user_id', '{$name}','{$phonenumber}','{$address}', '{$comment}')";
+	//just been posted. This is $cat_id. $user_id is the user id of the person posting
+	$insert_review_command = "INSERT INTO review VALUES(NULL,'$cat_id','{$category}','$user_id', '{$name}','{$phonenumber}','{$address}', '{$comment}')";
     $insert_into_review_table = mysqli_query($con,$insert_review_command);
 	
 }
@@ -66,10 +67,11 @@ else if ($num_rows < 1)
 	//if it's not in there, then add the category in the category table.
 	$insert_category_command = "INSERT INTO category VALUES(NULL, '{$category}', '$user_id')";
     $insert_into_category_table = mysqli_query($con,$insert_category_command);
+	//get the last autoincrement value of the category table
+    $cat_id = mysqli_insert_id($con);
 
-	
 	//and add it to the review table
-	$insert_review_command = "INSERT INTO review VALUES(NULL,'222','{$category}','$user_id', '{$name}','{$phonenumber}','{$address}', '{$comment}')";
+	$insert_review_command = "INSERT INTO review VALUES(NULL,'$cat_id','{$category}','$user_id', '{$name}','{$phonenumber}','{$address}', '{$comment}')";
     $insert_into_review_table = mysqli_query($con,$insert_review_command);
 
 //$rs1=mysqli_query($con, $sql); 
@@ -83,8 +85,8 @@ else if ($num_rows < 1)
 
 	//	if ($con->query($sql) === TRUE) {
 echo "Yes, it's been added correctly";
+echo $cat_id;
 
-//	header('Location:volleyLogin.php');
 
 /* 	} else {
 	echo "Error: " . $sql . "<br>" . $con->error;
@@ -94,6 +96,7 @@ echo "Yes, it's been added correctly";
 
 
 $con->close();
+header('Location:volleyLogin.php');
 }
 	
 

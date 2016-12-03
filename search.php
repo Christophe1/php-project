@@ -1,3 +1,14 @@
+<html>
+	<body>
+		<form action = 'search.php' method='post'>
+			<input type = 'text' name='search' size='50' />
+			<input type = 'submit' value = '>>'/>
+		</form>
+		
+
+	</body>
+</html>
+
 <?php
 require('dbConnect.php');
 
