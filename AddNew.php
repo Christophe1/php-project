@@ -7,16 +7,7 @@
 	echo "user name is " . $username . "<br>";
 	echo "user id is " . $user_id . "<br>"; 
 	
-	//get the row in the category table 
-	//$sql = "SELECT * FROM category WHERE user_id = '$user_id'";
-//get the result of the above
-	//$result = mysqli_query($con,$sql);
-//get every other record in the same row 
-	//$row = mysqli_fetch_assoc($result);
-//make the user_id record in that row a variable 
-	//$user_id = $row["user_id"];
-	//$cat_id = $row["cat_id"]; 
-
+	// If the create button is clicked
 if (isset($_POST['create'])) {
 	
 	
@@ -32,24 +23,11 @@ if (isset($_POST['create'])) {
 	$result=mysqli_query($con,$select_from_cat_table);
 	$num_rows = mysqli_num_rows($result);
 	
-	  // get the matching cat_id 
+	  // get the associated rows where the column cat_name = '$_POST[category]
 	   $row = mysqli_fetch_assoc($result);
+	   // get the associated cat_id column in that row, cat_id is the auto increment value
        $cat_id = $row["cat_id"];
-	  // echo $cat_id;
-	
-	//$get_cat_value = mysqli_query($con, $select_from_cat_table);
-//check the number of values of the category being posted
-	//$data = mysqli_fetch_array($get_cat_value, MYSQLI_NUM);
-	
-   //get the matching cat_id 
-	  // $row = mysqli_fetch_assoc($get_cat_value)
-      //  echo $row["cat_id"];
-		//echo "testing";
-  //      echo $row["fullname"];
-  //      echo $row["userstatus"];
-    
-   //  echo "testing2";
-	//echo $cat_id;
+
 //if the category name already exists in the category table, then don't add it in again
 	if($num_rows >= 1) {
     echo "This Already Exists<br/>";
@@ -60,11 +38,11 @@ if (isset($_POST['create'])) {
     $insert_into_review_table = mysqli_query($con,$insert_review_command);
 	
 }
-
+	//if the category is not in the category table, then add the category in the category table.
 else if ($num_rows < 1) 
 	
 {
-	//if it's not in there, then add the category in the category table.
+
 	$insert_category_command = "INSERT INTO category VALUES(NULL, '{$category}', '$user_id')";
     $insert_into_category_table = mysqli_query($con,$insert_category_command);
 	//get the last autoincrement value of the category table
@@ -74,16 +52,6 @@ else if ($num_rows < 1)
 	$insert_review_command = "INSERT INTO review VALUES(NULL,'$cat_id','{$category}','$user_id', '{$name}','{$phonenumber}','{$address}', '{$comment}')";
     $insert_into_review_table = mysqli_query($con,$insert_review_command);
 
-//$rs1=mysqli_query($con, $sql); 
-
-//$sql = ("INSERT INTO category VALUES(NULL, '{$category}', '$user_id')"); ("INSERT INTO review VALUES(NULL,'22','bobby','$user_id', 'bobby','bobby','bobby', '1')");
-
-//$sql2 = "INSERT INTO review VALUES(NULL,'222','{$category}','$user_id', '{$name}','{$phonenumber}','{$address}', '{$comment}')";
-//$rs2=mysqli_query($con, $sql2);
-//$sql = "INSERT INTO review VALUES(NULL,'22','bobby','$user_id', 'bobby','bobby','bobby', '1')";
-
-
-	//	if ($con->query($sql) === TRUE) {
 echo "Yes, it's been added correctly";
 echo $cat_id;
 
@@ -93,6 +61,8 @@ echo $cat_id;
 } */
 
 }
+
+
 
 
 $con->close();
@@ -108,18 +78,40 @@ header('Location:volleyLogin.php');
 	<body>
 	<h2>Create new Contact</h2>
 	<form method="post" action="" name="frmAdd">
-	<p><input type="text" name = "category" id = "category" placeholder = "category"></p>
-	<p><input type="text" name = "name" id = "name" placeholder = "name"></p>
-	<p><input type="text" name = "phonenumber" id = "phonenumber" placeholder = "phone number"></p>
-	<p><input type="text" name = "address" id = "address" placeholder = "address"></p>
-	<p><input type="text" name = "comment" id = "comment" placeholder = "comment"></p>
-	<h2>Visible to :</h2>
-	<input type="radio" name="allmycontacts" value="All my Contacts">All my Contacts
-	<input type="radio" name="selectwho" value="Select Who">Select Who
-	<input type="radio" name="public" value="Public">Public
-	<input type="radio" name="justme" value="Just me">Just me
+	<p><input type="text" name = "category" placeholder = "category"></p>
+	<p><input type="text" name = "name" placeholder = "name"></p>
+	<p><input type="text" name = "phonenumber" placeholder = "phone number"></p>
+	<p><input type="text" name = "address" placeholder = "address"></p>
+	<p><input type="text" name = "comment" placeholder = "comment"></p>
+	
+<!-- 	 <input type="checkbox" name="vehicle" value="Bike" checked> I have a bike<br>
+  <input type="checkbox" name="vehicle" value="Car" checked> I have a car<br> -->
+	<h2>Share with:</h2>
+	<input type="radio" name="select_who" value="Public">Public<br>
+	<input type="radio" name="select_who" value="Just me">Just me<br>
+	<input type="radio" name="select_who" value="All Contacts" checked>All my Contacts<br>
+	<input type="radio" name="select_who" value="Select Who">Select Who<br>
+</body>
+</html>
 
-	<p><input type="submit" name = "create" id = "create" value = "Create new Contact"></p>
+<?php
+ //this code below will print the username, or phone number, of contacts
+ // for $user_id 
+ $select_from_user_table = "SELECT  contacts.contact_id, user.username
+FROM contacts 
+INNER JOIN user
+ON contacts.contact_id=user.user_id WHERE contacts.user_id = '$user_id'";
+
+	//get the result of the above
+	$result2=mysqli_query($con,$select_from_user_table); 
+	//show the usernames, phone numbers
+	while($row = mysqli_fetch_assoc($result2)) {
+	echo "<input type='checkbox' >" . $row['username']  . "<br>";
+}
+?>
+	<html>
+	<body>
+	<p><input type="submit" name = "create" value = "Create new Contact"></p>
 	<a href="exit.php">Exit</a>
 
 	</form>

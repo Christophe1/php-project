@@ -4,18 +4,13 @@
 <?php
 
 require('dbConnect.php');
-/* $dbHost = 'localhost';
-$dbUsername = 'root';
-$dbPassword = '';
-$dbName = 'codexworld';
-//connect with the database
-$db = new mysqli($dbHost,$dbUsername,$dbPassword,$dbName); */
-//get search term
+
 $searchTerm = $_GET['term'];
 
 //get info from all cells in the row where review_id is equal to the review selected. The name, address etc...
-//$sql = "SELECT * FROM review WHERE review_id = " .$_GET['id'];
-$sql = "SELECT * FROM category WHERE cat_name LIKE '%".$searchTerm."%' ORDER BY cat_name ASC";
+//$sql = "SELECT * FROM category WHERE cat_name = " .$_GET['id'];
+//$sql = "SELECT * FROM category WHERE cat_name LIKE '%".$searchTerm."%' ORDER BY cat_name ASC";
+$sql = "SELECT * FROM category WHERE cat_name LIKE '%".$searchTerm."%' AND user_id = 2 ORDER BY cat_name ASC";
 
 //get the result of the above
 $result = mysqli_query($con, $sql);
