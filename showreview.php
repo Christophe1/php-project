@@ -24,7 +24,27 @@ echo "review id is " . $_GET['id'] . "<p>";
 		echo "Phone: " . $row['phone'] . "<br>";
 		echo "Address: " . $row['address'] . "<br>";
 		echo "Comment: " . $row['comment'] . "<br>";
+		echo "<br>";
+		echo "Shared with :" . "<br>";
 	}
+	
+			//we want to show the contacts that this review is shared with		
+	$select_from_review_shared ="SELECT  review_shared.contact_id, user.username
+FROM review_shared 
+INNER JOIN user
+ON review_shared.contact_id=user.user_id WHERE review_id = "  .$_GET['id'];
+		
+		
+			//get the result of the above
+	$result2=mysqli_query($con,$select_from_review_shared);
+
+	//show the usernames, phone numbers
+	while($row = mysqli_fetch_assoc($result2)) { 
+	//$contact_id = $row["contact_id"];
+	 echo $row["username"] . "<br>";
+		
+	}
+
 	// make the specified category cell etc into a variable
 	    $category=$row['cat_name'];
 		$name=$row['name'];

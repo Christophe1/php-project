@@ -46,22 +46,8 @@ if (isset($_POST['Save'])) {
 	
 }
 
-// Edit a new record if the button 'Save' is clicked.
+// Delte the record if the button 'Delete' is clicked.
 if (isset($_POST['Delete'])) {
-
-/*     $sql2 = "SELECT * FROM review WHERE review_id = ".$_GET['id'];
-    $result2 = mysqli_query($con,$sql2);
-	if (mysqli_num_rows($result2) > 0) {
-    echo "all good.";
-	while($rows = mysqli_fetch_assoc($result2)) {
-// output data of each review_id in the row
-
-        $bob=$rows['review_id'];
-	//	define("review", $review_id);
-		$_SESSION['review'] = $bob;
-	
-		echo $bob  . "<br>"; */
-	
 	
 	$sql = "delete from review where review_id = ".$_GET['id'];
 	
@@ -104,7 +90,7 @@ if (mysqli_num_rows($result) > 0) {
 }
 
 } */
-$con->close();
+//$con->close();
 
 
 ?>
@@ -119,13 +105,51 @@ $con->close();
 <p><input type="text" name = "phone" value = "<?=$phone?>"></p>
 <p><input type="text" name = "address" value = "<?=$address?>"></p>
 <p><input type="text" name = "comment"  value = "<?=$comment?>"></p>
-<h2>Visible to :</h2>
+
+<!--<h2>Visible to :</h2>
 <input type="radio" name="allmycontacts" value="All my Contacts">All my Contacts
 <input type="radio" name="selectwho" value="Select Who">Select Who
 <input type="radio" name="public" value="Public">Public -->
 
+<form action="" method="POST">
+	
+		<?php
+		
+		 //this code below will get the username (phone number) of contacts
+ // for $user_id. we get the 'contact_id'
+ //values in the contacts table for $user_id, match those contact_ids to the corresponding 
+ //'user_ids' in the user table, and then show the 'usernames' for each of those user_ids
+ $select_from_user_table = "SELECT  contacts.contact_id, user.username
+FROM contacts 
+INNER JOIN user
+ON contacts.contact_id=user.user_id WHERE contacts.user_id = '$user_id'";
+
+	//get the result of the above
+	$result2=mysqli_query($con,$select_from_user_table);
+
+		
+	//show the usernames, phone numbers
+	while($row = mysqli_fetch_assoc($result2)) { ?>
+	 <input type='checkbox' name='check_contacts[]' value='<?=$row['contact_id']?>'> <?php echo $row['username'] ?> </br>
+    
+		<?php	
+		//we need the php bracket below to close the while loop
+
+
+		}
+
+			?>
+	
+    <!--<input type="submit" name = "create" value = "Create new Contact"></p> -->
+	
+	
+	
+	<!--</form> -->
+
+
 <p><input type="submit" name = "Save" value = "Save"></p>
 <p><input type="submit" name = "Delete" value = "Delete"></p>
+<a href="exit.php">Exit</a>
 </form>
 
 </body>

@@ -22,8 +22,9 @@
   */
  
 
- //I'm using SELECT DISTINCT because I was getting Duplicate results
+
  //this code below will print the username, or phone number, of contacts
+ // for $user_id 
  $select_from_user_table = "SELECT  contacts.contact_id, user.username
 FROM contacts 
 INNER JOIN user
