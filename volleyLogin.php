@@ -2,7 +2,7 @@
 
 
 
-<html>
+<!-- <html>
 <head>
   <meta charset="utf-8">
   <title>Autocomplete textbox using jQuery, PHP and MySQL by CodexWorld</title>
@@ -12,7 +12,7 @@
   <script>
   $(function() {
     $( "#search_category" ).autocomplete({
-	<!-- search1 does the autocomplete, search.php displays the results properly -->
+	<!-- search1 does the autocomplete, search.php displays the results properly 
       source: 'search.php'
     });
   });
@@ -29,7 +29,7 @@
 		
 
 	</body>
-</html>
+</html> -->
 
 <?php
 

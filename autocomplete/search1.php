@@ -8,9 +8,9 @@ $db = new mysqli($dbHost,$dbUsername,$dbPassword,$dbName);
 //get search term
 $searchTerm = $_GET['term'];
 //get matched data from skills table
-$query = $db->query("SELECT * FROM skills WHERE skill LIKE '%".$searchTerm."%' ORDER BY skill ASC");
+$query = $db->query("SELECT * FROM review WHERE cat_name LIKE '%".$searchTerm."%' ORDER BY cat_name ASC");
 while ($row = $query->fetch_assoc()) {
-    $data[] = $row['skill'];
+    $data[] = $row['cat_name'];
 }
 //return json data
 echo json_encode($data);

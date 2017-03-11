@@ -9,7 +9,7 @@ echo "user id is " . $user_id . "<br>";
 echo "user name is " . $username . "<br>";
 echo "review id is " . $_GET['id'] . "<p>";
 
-
+//these values are being remembered from the showreview.php page
 $category=$_SESSION['cat_name'];
 
 		$name=$_SESSION['name'];
@@ -17,15 +17,6 @@ $category=$_SESSION['cat_name'];
 		$address=$_SESSION['address'];
 		$comment=$_SESSION['comment'];
 
-
-//$user_id=$_SESSION['user_id'];
-//$review_id = $_SESSION['review_id'];
-//$review_id = $_SESSION['review_id'];
-
-/* echo $category;
-echo "<br>";
-echo $_GET['id']; */
-//echo review;
 // Edit a new record if the button 'Save' is clicked.
 if (isset($_POST['Save'])) {
 
@@ -39,11 +30,12 @@ if (isset($_POST['Save'])) {
 
 	if(mysqli_query($con, $sql)) {
 	//	echo "Success";
-		header('Location:volleyLogin.php');
+	//	header('Location:volleyLogin.php');
 	} else {
 		echo "Error " .mysqli_error($con);
 	}
 	
+
 }
 
 // Delte the record if the button 'Delete' is clicked.
@@ -61,36 +53,6 @@ if (isset($_POST['Delete'])) {
             
 	
 }
-//}
-//}
-/* 	$id = '';
-	$category = '';
-	$name = '';
-	$phonenumber = '';
-	$address = '';
-	$comment = '';
-	echo $_GET['id']; */
-/* if (ISSET($_GET['id'])) {
-	
-	$sql = "select * from review where review_id = " .$_GET['id'];
-	$result = mysqli_query($con, $sql);
-	
-if (mysqli_num_rows($result) > 0) {
-	
-	$row = mysqli_fetch_assoc($result);
-	$id = $row['user_id'];
-	$category = $row['cat_name'];
-	$name = $row['name'];
-	$phonenumber = $row['phone'];
-	$address = $row['address'];
-	$comment = $row['comment'];
-	
-	echo "user id is " .$id;
-	
-}
-
-} */
-//$con->close();
 
 
 ?>
@@ -99,6 +61,7 @@ if (mysqli_num_rows($result) > 0) {
 <html>
 <body>
 <h2>Edit Record</h2>
+
 <form method="post" action="">
 <p><input type="text" name = "category" value = "<?=$category?>"></p>
 <p><input type="text" name = "name" value = "<?=$name?>"></p>
@@ -127,25 +90,30 @@ ON contacts.contact_id=user.user_id WHERE contacts.user_id = '$user_id'";
 	//get the result of the above
 	$result2=mysqli_query($con,$select_from_user_table);
 
-		
-	//show the usernames, phone numbers
-	while($row = mysqli_fetch_assoc($result2)) { ?>
-	 <input type='checkbox' name='check_contacts[]' value='<?=$row['contact_id']?>'> <?php echo $row['username'] ?> </br>
-    
-		<?php	
-		//we need the php bracket below to close the while loop
+		//we want to get contacts who the user shares the review with, which are those contacts in review_shared
 
-
-		}
-
-			?>
+$sql="SELECT contact_id FROM review_shared where user_id = '$user_id' AND review_id = " .$_GET['id'] ;
+//make it into an array, so we can compare it against all the contacts the user has, in the contacts table
+$review_shared = array();
+$result = mysqli_query($con,$sql);
+//fill the array
+while ($row = mysqli_fetch_assoc($result))
+{
+  $review_shared[] = $row['contact_id'];
+  //echo $row['contact_id'];
+		//show the usernames, phone numbers
+}
 	
-    <!--<input type="submit" name = "create" value = "Create new Contact"></p> -->
+     // $review_shared=array(3,5,6);//get contact_id in this from shared table
+     while($row = mysqli_fetch_assoc($result2)) {
+		 //if contact_id in the contacts table is also in the review_shared table
+        if(in_array($row['contact_id'],$review_shared)){ ?>
+             <input type='checkbox' name='check_contacts[]' value='<?=$row['contact_id']?>' checked="checked"> <?php echo $row['username'] ?> </br>
+         <?php  }else{?>
+        <input type='checkbox' name='check_contacts[]' value='<?=$row['contact_id']?>' > <?php echo $row['username'] ?> </br>           
+   <?php }}?>
 	
 	
-	
-	<!--</form> -->
-
 
 <p><input type="submit" name = "Save" value = "Save"></p>
 <p><input type="submit" name = "Delete" value = "Delete"></p>
@@ -154,3 +122,54 @@ ON contacts.contact_id=user.user_id WHERE contacts.user_id = '$user_id'";
 
 </body>
 </html>
+
+	<?php
+//more php code, here we want to save the checked contacts to the review_shared table ;  that is,
+//who the user wants to share reviews with
+if(!empty($_POST['check_contacts'])) {
+	
+			$already_checked = "DELETE from review_shared WHERE user_id = '$user_id' AND review_id = " .$_GET['id'];
+		
+		//echo "<pre>$already_checked</pre>";
+		mysqli_query($con,$already_checked);
+	
+
+		
+	foreach($_POST['check_contacts'] as $check) {
+	
+			//$check="";
+	//if the contact in review_shared is already checked, we don't want to save it multiple times
+/* 		$already_checked = "DELETE * from review_shared WHERE user_id = '$user_id' AND contact_id = '$check' AND review_id = " .$_GET['id'];
+		
+		mysqli_query($con,$already_checked); */
+	  //  $num_rows = mysqli_num_rows($already_checked_result);
+		
+	/* 	if($num_rows >= 1) {
+		echo "This is already a contact";
+		}  */
+		
+	//else if ($num_rows < 1) {
+	
+		//$_GET['id'] is the current review for which contacts are being edited, we are checking a contact to share that review with
+			$insert_review_shared_command = "INSERT INTO review_shared VALUES(NULL," .$_GET['id']. ", '$user_id','$check')";
+
+		//we want to save the checked contacts into the review_shared table
+		//$insert_review_shared_command = "INSERT INTO review_shared VALUES(NULL, '1', '2')";
+		$insert_into_review_shared_table = mysqli_query($con,$insert_review_shared_command);
+            echo $check; //echoes the value set in the HTML form for each checked checkbox.
+                         //so, if I were to check 1, 3, and 5 it would echo value 1, value 3, value 5.
+                         //in your case, it would echo whatever $row['Report ID'] is equivalent to.
+		// }
+	//}
+	
+	//	go to the VolleyLogin page when changes have been saved
+    header('Location:volleyLogin.php');
+}
+}
+
+
+
+	$con->close();
+
+	
+	?> 
