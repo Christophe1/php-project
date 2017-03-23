@@ -1,0 +1,108 @@
+PHP, how do I find if a word is in my string ?
+
+I've tried using \/b and [[:<:]], not sure why they don't work. And % only works if it's at the very beginning of the string.
+
+In my category table I have strings like :
+
+Race car driver
+Driving Instructor
+
+In the search box, if the user types 'driv' (not case sensitive), I want both of the strings above to appear.
+
+//if a person arrives at this page other than doing a search then go to the main page
+if(!isset($_POST['search'])) {
+	header("Location:mainpage.php");
+}
+
+
+
+$search_sql="SELECT * FROM category WHERE user_id = '$user_id' AND cat_name LIKE '[[:<:]]".$_POST['search']."%'";
+
+$search_query=mysqli_query($con,$search_sql);
+if(mysqli_num_rows($search_query)!=0) {
+$search_rs=mysqli_fetch_assoc($search_query);
+}
+
+if(mysqli_num_rows($search_query)!=0) {
+	
+	do { ?>
+	<p><?php echo $search_rs['cat_name']; ?></p>
+	
+	etc... etc ...
+	
+	
+
+$search_sql = "SELECT review_shared.review_id
+FROM review_shared
+WHERE review_shared.contact_id = '$user_id' AND  review_id LIKE '".$_POST['search']."%' or review_id LIKE '% ".$_POST['search']."%'";
+
+
+
+
+
+$search_sql = "SELECT review.cat_name, review_shared.review_id
+FROM review
+INNER JOIN review_shared
+ON
+review_shared.contact_id = '$user_id' WHERE review_id LIKE '".$_POST['search']."%' or review_id LIKE '% ".$_POST['search']."%'";
+
+*************************
+
+In review_shared, show how many times contact_id = $user_id when
+cat_name  = $_POST['search']
+
+in review table is the same 
+
+
+
+<!DOCTYPE html>
+<html>
+<body>
+
+<?php
+$t = 20;
+
+if ($t < 10) {
+    echo "Have a good morning!";
+} if ($t < 20) {
+    echo "Have a good day!";
+} else {
+    echo "Have a good night!";
+}
+?>
+ 
+</body>
+</html>
+
+-----------------
+'Dancer'
+
+Dancer and Gymnast
+Bernie
+1234
+No results
+
+----------------
+'Dance'
+
+Dancer and Gymnast
+Bernie
+1234
+
+John Grisham:
+Dance Instructor
+Guillaume
+0033124
+
+---------------
+'Gymnast'
+
+Dancer and Gymnast
+Bernie
+1234
+
+JK Rowling:
+Dancer and Gymnast
+Bernie
+1234
+

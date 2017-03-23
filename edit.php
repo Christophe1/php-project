@@ -34,7 +34,8 @@ if (isset($_POST['Save'])) {
 	} else {
 		echo "Error " .mysqli_error($con);
 	}
-	
+	//	go to the VolleyLogin page when changes have been saved
+    header('Location:volleyLogin.php');	
 
 }
 
@@ -126,48 +127,28 @@ while ($row = mysqli_fetch_assoc($result))
 	<?php
 //more php code, here we want to save the checked contacts to the review_shared table ;  that is,
 //who the user wants to share reviews with
-if(!empty($_POST['check_contacts'])) {
-	
 			$already_checked = "DELETE from review_shared WHERE user_id = '$user_id' AND review_id = " .$_GET['id'];
-		
-		//echo "<pre>$already_checked</pre>";
+		mysqli_query($con,$already_checked);
+//if there are checked contacts
+if(isset($_POST['check_contacts']))  {
+	
+	//delete all checked contacts
+			$already_checked = "DELETE from review_shared WHERE user_id = '$user_id' AND review_id = " .$_GET['id'];
 		mysqli_query($con,$already_checked);
 	
-
-		
+		//for each contact that is checked
 	foreach($_POST['check_contacts'] as $check) {
-	
-			//$check="";
-	//if the contact in review_shared is already checked, we don't want to save it multiple times
-/* 		$already_checked = "DELETE * from review_shared WHERE user_id = '$user_id' AND contact_id = '$check' AND review_id = " .$_GET['id'];
-		
-		mysqli_query($con,$already_checked); */
-	  //  $num_rows = mysqli_num_rows($already_checked_result);
-		
-	/* 	if($num_rows >= 1) {
-		echo "This is already a contact";
-		}  */
-		
-	//else if ($num_rows < 1) {
 	
 		//$_GET['id'] is the current review for which contacts are being edited, we are checking a contact to share that review with
 			$insert_review_shared_command = "INSERT INTO review_shared VALUES(NULL," .$_GET['id']. ", '$user_id','$check')";
 
 		//we want to save the checked contacts into the review_shared table
-		//$insert_review_shared_command = "INSERT INTO review_shared VALUES(NULL, '1', '2')";
 		$insert_into_review_shared_table = mysqli_query($con,$insert_review_shared_command);
-            echo $check; //echoes the value set in the HTML form for each checked checkbox.
-                         //so, if I were to check 1, 3, and 5 it would echo value 1, value 3, value 5.
-                         //in your case, it would echo whatever $row['Report ID'] is equivalent to.
-		// }
-	//}
 	
-	//	go to the VolleyLogin page when changes have been saved
-    header('Location:volleyLogin.php');
-}
+
 }
 
-
+}
 
 	$con->close();
 
