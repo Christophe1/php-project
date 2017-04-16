@@ -16,34 +16,6 @@
 </html>
 </p>
 
-<!-- <html>
-<head>
-  <meta charset="utf-8">
-  <title>Autocomplete textbox using jQuery, PHP and MySQL by CodexWorld</title>
-  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
-  <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-  <script>
-  $(function() {
-    $( "#search_category" ).autocomplete({
-	<!-- search1 does the autocomplete, search.php displays the results properly 
-      source: 'search.php'
-    });
-  });
-  </script>
-</head>
-
-	<body>
-	<div class="ui-widget">
-	<label for="search_category">Search: </label>
-		<form action = 'search.php' method='post'>
-			<input type = 'text' name='search' size='30' id='search_category' />
-			<input type = 'submit' value = '>>'/>
-		</form>
-		
-
-	</body>
-</html> -->
 
 <?php
 
