@@ -1,66 +1,108 @@
 <?php
 //user_id_contacts_2_fk
 //contacts_ibfk_1
-
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+//***************************************************
 require('dbConnect.php');
-//this is me, +353872934480, my user_id in the user table
-$user_id = '20';
-//this is one of my contacts in my phone, for example +353864677745
-//$CheckContact = '+123';
-$CheckContact = $_POST['phonenumber'];
-//see if +353864677745 is a user of my app - if they are in the user table. 
-$sql = "SELECT * FROM user WHERE username = '$CheckContact'";
-$result = mysqli_query($con, $sql);
-$num_rows = mysqli_num_rows($result);
 
-//if +353864677745 is in the user table...
-	
-	if($num_rows > 0) {
-	echo 'success'; //. "<br>";
-	echo "CheckContact is " . $CheckContact  . "<br>";
-	// we want to put +353864677745 in the contacts table, as one of +353872934480 contacts
-	// get the associated rows of $CheckContact
-	   $row = mysqli_fetch_assoc($result);
-	// get the associated user_id in that row, that's what we want to put into the contacts table
-	   $contact_id = $row["user_id"];
-	   echo "the user id of the contact is ", $contact_id;
-	$insert_into_contacts_command = "INSERT INTO contacts VALUES(NULL, '$user_id','$contact_id')";
-	$insert_into_contacts_table = mysqli_query($con,$insert_into_contacts_command);
-	if ( false===$insert_into_contacts_table ) {
-  printf("error: %s\n", mysqli_error($con));
-}
-} 
-//if +353864677745 is NOT in the user table...
-else {
-	
-	echo 'failure';
-	}
-	
-	        //I need to check if a contact in the user's phone contacts is already a user of populisto.
-        //If yes, then in the contacts table put in the user's user_id
-        //and the contact's user id in contacts_id
-// **************************************************
-/* $CheckIfNumberIsaContact = $_POST['phonenumber'];
-//$CheckIfNumberIsaContact = "54d54";
-$sql = "SELECT username FROM user WHERE username = ?";
 
-$stmt = $con -> prepare($sql);
+//this is me, +567890123, my user_id in the user table
+$user_id = 20;
 
-	$stmt -> bind_param('s',$CheckIfNumberIsaContact);
+//post all contacts in my phone as a JSON array
+$json = $_POST['phonenumber'];
+//decode the JSON
+$array = json_decode($json);
+//bind 
+ $query = "SELECT * FROM user WHERE username = ?";
+ $stmt = $con->prepare($query) or die(mysqli_error($con));
+ $stmt->bind_param('s', $phonenumber) or die ("MySQLi-stmt binding failed ".$stmt->error);
 
-	$stmt ->execute(); 
 
-//save it as a variable so it can be reused later	
-$stmt ->bind_result($username);
-	
- 	if($row = $stmt ->fetch())
-	
+ //for each value of phone_number in the array, call it $phonenumber
+	foreach ($array as $value)
 	{
-		echo "success";
+		$phonenumber = $value->phone_number;
+		
+			//	$sql = "SELECT * FROM user WHERE username = '$phonenumber'";
+		//$result = mysqli_query($con, $sql);
 	
-	}
-else {
-	echo "failed";
-} */
+		//*****SECURE
+$stmt->execute() or die ("MySQLi-stmt execute failed ".$stmt->error);
+//$result = $con->($query);
+//$result = $stmt->get_result(); 
+//$stmt->store_result();
+//$num_rows = $stmt->num_rows();
+ //$result = mysqli_query($con, $query);
+//echo $result;
+ //if ($stmt->num_rows > 0) { // Check if there are any rows matching this value
+	 $result = $stmt->get_result(); // Convert from MySQLi_stmt to MySQLi_result (to use fetch_assoc())
+	//  while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
+	// while($row = mysqli_fetch_assoc($result)){ 
+	     echo "Number of rows matching username '".$value->phone_number."' from user-table is " . $result->num_rows  . " rows.<br>"; 
+	// $contact_id = $row['user_id'];
+	// echo $contact_id;
+	//	echo "phonenumber is " . $phonenumber  . "<br>";
+	//echo "number of phone numbers in the user table is " . $result->num_rows  . "<br>"; 
+	        while ($row = $result->fetch_assoc()) {
+			//this the the user_id in the user table of the matching phone number	
+            echo $row['user_id']."<br />";
+			//call this user_id contact_id
+			$contact_id = $row['user_id'];
+			
+			//if ($stmt->num_rows == 0)
+			
+				$stmt2 = $con->prepare("INSERT INTO contacts (user_id, contact_id) VALUES(?,?)") or die(mysqli_error($con));
+				$stmt2->bind_param('ii', $user_id, $contact_id) or die ("MySQLi-stmt binding failed ".$stmt2->error);
+				$stmt2->execute() or die ("MySQLi-stmt execute failed ".$stmt2->error);
+	//$insert_into_contacts_table = mysqli_query($con,$insert_into_contacts_command);
+			
+	} //}
+/* 	      else {
+        echo "No rows matching username ".$value->phone_number.".<br />";
+    } */
+ }
+// while ($row = $stmt->fetch_array(MYSQLI_ASSOC)) {
+    // 
 
-?>
+//}
+ 
+ /* Bind results */
+   // $stmt -> bind_result($testfield1);
+
+    /* Fetch the value */
+  //  $stmt -> fetch();
+
+// $num_rows = $stmt->num_rows;
+//*****
+//echo "phonenumber is " . $phonenumber  . "<br>";
+
+	
+//	if($num_rows > 0) {
+
+	//echo "phonenumber is " . $phonenumber  . "<br>";
+ 
+//echo $phonenumber . "<br>";
+//var_dump($result);
+//var_dump($stmt);
+//$num_rows = $stmt->num_rows();
+//*****
+/* 	}
+	else {
+		echo "no match";
+	} */
+//	}
+//	echo $num_rows . "<br>";
+var_dump($_POST["phonenumber"]);
+$stmt->close();
+//mysqli_close($con);	
+/* 	
+	else {
+	var_dump($stmt);
+	
+	
+	} */
+		
+		?>
