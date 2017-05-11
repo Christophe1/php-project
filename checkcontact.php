@@ -30,10 +30,10 @@ $stmt->execute() or die ("MySQLi-stmt execute failed ".$stmt->error);
 
 	        while ($row = $result->fetch_assoc()) {
 			//this the the user_id in the user table of the matching phone number	
-            echo $row['user_id']."<br />";
+            //echo $row['user_id']."<br />";
 			//call this user_id contact_id
 			$contact_id = $row['user_id'];
-			echo $contact_id;
+			echo $contact_id ."<br />";
 
 				//make a select statement for contacts table where user_id and contact_id = $user_id and $contact_id.If
 				//this value doesn't exist then put it in the contacts table
