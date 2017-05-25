@@ -39,7 +39,7 @@ if (isset($_POST['Save'])) {
 
 }
 
-// Delte the record if the button 'Delete' is clicked.
+// Delete the record if the button 'Delete' is clicked.
 if (isset($_POST['Delete'])) {
 	
 	$sql = "delete from review where review_id = ".$_GET['id'];

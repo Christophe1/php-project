@@ -55,7 +55,7 @@ require('dbConnect.php');
 
 
 	$sql2 = "SELECT * FROM review WHERE user_id = '$user_id'";
-
+$results = array();
 
 	$result2 = mysqli_query($con,$sql2);
 
@@ -68,16 +68,24 @@ require('dbConnect.php');
 	if (mysqli_num_rows($result) > 0) {
 
 		//if username has reviews in the db
-	while($rows = mysqli_fetch_assoc($result2)) {
+	while($row = mysqli_fetch_array($result2)) {
+		//make an array called $results
+				 $results[] = array(
+		 'category' => $row['cat_name'], 
+		 'name' => $row['name'],
+		 'phone' => $row['phone']
+		 );
 
         $review_id=$rows['review_id'];
 		$_SESSION['review'] = $review_id;
-	
+	//print out the details
 		echo "review id is " . $review_id  . "<br>";
 		echo  "<br>";
-        echo "Category: " . $rows['cat_name'] . "<br>";
-		echo "Name: " . $rows['name'] . "<br>";
-		echo "Phone: " . $rows['phone'] . "<br>";
+        echo "Category: " . $row['cat_name'] . "<br>";
+		echo "Name: " . $row['name'] . "<br>";
+		echo "Phone: " . $row['phone'] . "<br>";
+		
+
 
 //html stuff comes next
 		?>
@@ -95,8 +103,9 @@ require('dbConnect.php');
 	</html>
 		
 		<?php	
-}
-
+//make $results into a json array
+$json = json_encode($results);
+echo $json;
 			?>
 			
 		<html>
