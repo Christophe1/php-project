@@ -2,9 +2,9 @@
 
 require('dbConnect.php');
 
-//this is me, my user_id in the user table
+//this is me, my username in the user table
 $Number = $_POST['phonenumberofuser'];
-
+//$Number = "+353872934480";
 // The ? below are parameter markers used for variable binding
 // auto increment does not need prepared statements
 
@@ -17,43 +17,25 @@ $Number = $_POST['phonenumberofuser'];
 			    $result = $stmt->get_result();
 				
 			while ($row = $result->fetch_assoc()) {
-			//this is the user_id in the user table of the user
-            echo $row['user_id']."<br />";
+				//get the corresponding user_id in the row
+			//this is the matching user_id in the user table of the user
+            //echo $row['user_id']."<br />";
 			$user_id = $row["user_id"];
+			//echo $user_id;
 			}
-			echo $user_id;
+			
+			
+			//this is me, my user_id in the user table
+//$user_id = $_POST['useridofuser'];
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-require('dbConnect.php');
-$user_id = "3";
+//$user_id=3;
 
 $sql2 = "SELECT * FROM review WHERE user_id = '$user_id'";
 $results = array();
 
 	$result2 = mysqli_query($con,$sql2);
 
-//if username isn't in the db
-//	if (mysqli_num_rows($result)==0) {
- //   echo "Failed, sorry";
-//}
-	
-//if username is in the db
-	//if (mysqli_num_rows($result) > 0) {
-
-		//if username has reviews in the db
+		//if user_id has reviews in the db
 	while($row = mysqli_fetch_array($result2)) {
 		//make an array called $results
 				 $results[] = array(
@@ -62,19 +44,11 @@ $results = array();
 		 'phone' => $row['phone'],
 		 'comment' => $row['comment'],
 		 );
-
-       // $review_id=$rows['review_id'];
-		//$_SESSION['review'] = $review_id;
-	//print out the details
-/* 		echo "review id is " . $review_id  . "<br>";
-		echo  "<br>";
-        echo "Category: " . $row['cat_name'] . "<br>";
-		echo "Name: " . $row['name'] . "<br>";
-		echo "Phone: " . $row['phone'] . "<br>"; */
-		
-		//make $results into a json array
-
 	}
 	$json = json_encode($results);
+//echo $user_id;	
 echo $json;
+//echo $Number;		
+			
+			
 		?>
