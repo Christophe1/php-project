@@ -8,7 +8,7 @@ $Number = $_POST['phonenumberofuser'];
 // The ? below are parameter markers used for variable binding
 // auto increment does not need prepared statements
 
-// get the username in the user table, then get the matching user_id
+// get the username in the user table - the phone number, which is unique - then get the matching user_id
 				// so we can check contacts against it 
 				$query = "SELECT * FROM user WHERE username = ?";
 				$stmt = $con->prepare($query) or die(mysqli_error($con));
@@ -27,13 +27,18 @@ $Number = $_POST['phonenumberofuser'];
 			
 			//this is me, my user_id in the user table
 //$user_id = $_POST['useridofuser'];
-
+//'$user_id'
 //$user_id=3;
 
-$sql2 = "SELECT * FROM review WHERE user_id = '$user_id'";
+$sql2 = "SELECT * FROM review WHERE user_id = ?";
+$stmt2 = $con->prepare($sql2) or die(mysqli_error($con));
+$stmt2->bind_param('i', $user_id) or die ("MySQLi-stmt binding failed ".$stmt2->error);
+$stmt2->execute() or die ("MySQLi-stmt execute failed ".$stmt2->error);
+$result2 = $stmt2->get_result();
+
 $results = array();
 
-	$result2 = mysqli_query($con,$sql2);
+	//$result2 = mysqli_query($con,$sql2);
 
 		//if user_id has reviews in the db
 	while($row = mysqli_fetch_array($result2)) {
@@ -43,6 +48,7 @@ $results = array();
 		 'name' => $row['name'],
 		 'phone' => $row['phone'],
 		 'comment' => $row['comment'],
+		 'reviewid' => $row['review_id'],
 		 );
 	}
 	$json = json_encode($results);
