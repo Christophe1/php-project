@@ -1,5 +1,7 @@
 <?php 
 
+
+
 require('dbConnect.php'); 
 
 //use the variables we created in volleyLogin.php

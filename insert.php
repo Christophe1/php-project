@@ -4,6 +4,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 require('dbConnect.php');
+//post the phone number of the user, which in the table is username
 $Number = $_POST['phonenumberofuser'];
 
 // The ? below are parameter markers used for variable binding
@@ -17,6 +18,7 @@ $Number = $_POST['phonenumberofuser'];
 			    $result = $stmt->get_result();
 			
 			   //if the username is not already in the user table, then put him in
+			   //the other value in the table, user_id, is auto incremented, so it is inserted automatically
 			    If ($result->num_rows == 0) {
 				$stmt2 = $con->prepare("INSERT INTO user (username) VALUES(?)") or die(mysqli_error($con));
 				$stmt2->bind_param('s', $Number) or die ("MySQLi-stmt binding failed ".$stmt2->error);
