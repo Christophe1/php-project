@@ -4,6 +4,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 require('dbConnect.php');
+
 //post the phone number of the user, which in the table is username
 $Number = $_POST['phonenumberofuser'];
 

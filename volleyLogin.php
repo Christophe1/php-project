@@ -76,7 +76,7 @@ $results = array();
 		 'phone' => $row['phone']
 		 );
 
-        $review_id=$rows['review_id'];
+        $review_id=$row['review_id'];
 		$_SESSION['review'] = $review_id;
 	//print out the details
 		echo "review id is " . $review_id  . "<br>";
@@ -104,8 +104,8 @@ $results = array();
 		
 		<?php	
 //make $results into a json array
-$json = json_encode($results);
-echo $json;
+//$json = json_encode($results);
+//echo $json;
 			?>
 			
 		<html>
@@ -124,13 +124,13 @@ echo $json;
 	</body>
 	</html>
 		
-<?php		
+<?php 		
 
 
 
 }
-
+	}
 
 	$con->close();
-?>
 
+?>

@@ -23,6 +23,7 @@ $Review_id = $_POST['review_id'];
 				class Review {
 					
 					public $category = "";
+					public $category_id = "";
 					public $name = "";
 					public $phone = "";
 					public $address = "";
@@ -36,6 +37,7 @@ $Review_id = $_POST['review_id'];
 				//get the corresponding fields in the review_id row
 				//make it into a json object
 			$review -> category = $row["cat_name"];
+			$review -> category_id = $row["cat_id"];
 			$review -> name = $row["name"];
 			$review -> phone = $row["phone"];
 			$review -> address = $row["address"];

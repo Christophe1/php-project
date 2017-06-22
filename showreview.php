@@ -2,7 +2,7 @@
 require('dbConnect.php');
 
 session_start();
-//review = $_SESSION['review'];
+$review = $_SESSION['review'];
 $username = $_SESSION['username'];
 $user_id = $_SESSION['user_id'];
 echo "user id is " . $user_id . "<br>";
@@ -20,7 +20,7 @@ echo "review id is " . $_GET['id'] . "<p>";
 	//*****************************************************
 	//Don't think we need the 'if', as there will always be more than one review for the review we selected
 	//if reviews from the user exist, show them
-//	if (mysqli_num_rows($result) > 0) {
+	if (mysqli_num_rows($result) > 0) {
 	//*****************************************************
 	//show review details for the review selected
 		$row = mysqli_fetch_assoc($result);
@@ -32,7 +32,7 @@ echo "review id is " . $_GET['id'] . "<p>";
 		echo "<br>";
 		echo "Shared with :" . "<br>";
 	
-	//}
+	}
 	
 		// make the specified category cell etc into a variable
 	    $category=$row['cat_name'];
