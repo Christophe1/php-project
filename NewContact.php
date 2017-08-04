@@ -98,11 +98,6 @@ $Number = $_POST['phonenumberofuser'];
 				
 	//$json = json_encode($review);
 	echo $last_id
-//echo $user_id . " " . $category . " " .  $name . " " .  $phone . " " .  $address . " " .  $comment;
-	//echo $Review_id . " " . $category . " " .  $name . " " .  $phone . " " .  $address . " " .  $comment;
 
-//echo $json;
-//echo $Number;		
-			
 
 		?>

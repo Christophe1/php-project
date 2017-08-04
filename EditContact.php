@@ -56,7 +56,7 @@ require('dbConnect.php');
 				
 				//If the old category has people using it then insert a new category
 				$stmt3 = $con->prepare("INSERT INTO category (cat_name, user_id) VALUES(?,?)") or die(mysqli_error($con));
-				$stmt3->bind_param('si', $category, $user_id) or die ("MySQLi-stmt binding failed ".$stmt3->error);
+				$stmt3->bind_param('si', $category, $user_id) or die ("MySQLi-stmt bindiiiiing failed ".$stmt3->error);
 				$stmt3->execute() or die ("MySQLi-stmt execute failed ".$stmt3->error);
 				//$result2 = $stmt2->get_result();
 				//this is the last auto increment value, cat_id, which we need to put into the review table
@@ -81,7 +81,7 @@ require('dbConnect.php');
 //post the phone number of the user, which in the table is username
 
 //received from app
-$Number = $_POST['phonenumberofuser'];
+/* $Number = $_POST['phonenumberofuser'];
 
 //now we need to get the matching user_id
 
@@ -97,7 +97,7 @@ $Number = $_POST['phonenumberofuser'];
 			//this is the matching user_id in the user table of the user
 			$user_id = $row["user_id"];
 			//echo $user_id;
-			}
+			} */
 			
 			//*********************************************8
 			
