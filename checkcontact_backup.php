@@ -23,8 +23,6 @@ $Number = $_POST['phonenumberofuser'];
 			$user_id = $row["user_id"];
 			}
 			
-			//we want to get 
-			
 //post all contacts in my phone as a JSON array
 $json = $_POST['phonenumberofcontact'];
 //decode the JSON
@@ -63,13 +61,11 @@ $stmt2->execute() or die ("MySQLi-stmt execute failed ".$stmt2->error);
 			
 			//if there's a match, put the phone number in our array
 			if(!empty($row['username'])) {
-				//$results of the matching contacts will be of the form [{"phone_number":"+123456"}, etc...]
-			$results[] = array('phone_number' => $row['username']);
+			$results[] = array('contact_phonenumber' => $row['username']);
 					}
 					
 			//make a select statement for contacts table where user_id = $user_id and contact_id = $contact_id. Check
-			//if the number in the user's phone contacts is in the contacts table. We use this for updating contacts who
-			//who may have been added into user's contacts since the last time using the app
+			//if the number in the user's phone contacts is in the contacts table
 				
 				$query3 = "SELECT * FROM contacts WHERE user_id = ? AND contact_id = ?";
 				$stmt3 = $con->prepare($query3) or die(mysqli_error($con));
@@ -78,6 +74,7 @@ $stmt2->execute() or die ("MySQLi-stmt execute failed ".$stmt2->error);
 			    $result3 = $stmt3->get_result();
 			
 			   //if the contact is not already in the contacts table, then put him in
+			   //if there is nothing in the above result
 			    If ($result3->num_rows == 0) {
 				$stmt4 = $con->prepare("INSERT INTO contacts (user_id, contact_id) VALUES(?,?)") or die(mysqli_error($con));
 				$stmt4->bind_param('ii', $user_id, $contact_id) or die ("MySQLi-stmt binding failed ".$stmt4->error);
