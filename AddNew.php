@@ -1,6 +1,6 @@
 <?php 
 
-
+		
 
 require('dbConnect.php'); 
 
@@ -12,26 +12,26 @@ require('dbConnect.php');
 	echo "user id is " . $user_id . "<br>"; 
 	
 	// If the 'create new Contact' button is clicked
-if (isset($_POST['create'])) {
+			if (isset($_POST['create'])) {
 	
 	
-//	$sql = "INSERT INTO category VALUES(cat_id, cat_name, user_id) VALUES('123', 'Bin man', '456')";
+			//	$sql = "INSERT INTO category VALUES(cat_id, cat_name, user_id) VALUES('123', 'Bin man', '456')";
 	
-	$category = ($_POST['category']);
-	$name = ($_POST['name']);
-	$phonenumber = ($_POST['phonenumber']);
-	$address = ($_POST['address']);
-	$comment = ($_POST['comment']);
+			$category = ($_POST['category']);
+			$name = ($_POST['name']);
+			$phonenumber = ($_POST['phonenumber']);
+			$address = ($_POST['address']);
+			$comment = ($_POST['comment']);
 	
-	//check if the category being entered is already there
-	$select_from_cat_table = "SELECT * FROM category WHERE cat_name = '$_POST[category]'";
-	$result=mysqli_query($con,$select_from_cat_table);
-	$num_rows = mysqli_num_rows($result);
-	
-	  // get the associated rows where the column cat_name = '$_POST[category]
-	   $row = mysqli_fetch_assoc($result);
-	   // get the associated cat_id column in that row, cat_id is the auto increment value
-       $cat_id = $row["cat_id"];
+			//check if the category being entered is already there
+			$select_from_cat_table = "SELECT * FROM category WHERE cat_name = '$_POST[category]'";
+			$result=mysqli_query($con,$select_from_cat_table);
+			$num_rows = mysqli_num_rows($result);
+			
+			// get the associated rows where the column cat_name = '$_POST[category]
+			$row = mysqli_fetch_assoc($result);
+			// get the associated cat_id column in that row, cat_id is the auto increment value
+			$cat_id = $row["cat_id"];
 
 //if the category name already exists in the category table, then don't add it in again
 	if($num_rows >= 1) {
