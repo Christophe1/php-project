@@ -1,6 +1,5 @@
 <?php
 require('dbConnect.php');
-
 				//received from app
 				//first of all, we need to see if the updated category name already exists in the db.
 				//This determines everything else
@@ -21,14 +20,13 @@ require('dbConnect.php');
 				$public_or_private = $_POST["public_or_private"];
 				
 				
-				// check to see if the BEING-UPDATED-TO CATEGORY exists in the category table
+				// check to see if the BEING-UPDATED-TO CATEGORY to exists in the category table
 				$query = "SELECT * FROM category WHERE cat_name = ?";
 				$stmt = $con->prepare($query) or die(mysqli_error($con));
 				$stmt->bind_param('s', $category) or die ("MySQLi-stmt binding failed ".$stmt->error);
 				$stmt->execute() or die ("MySQLi-stmt execute failed ".$stmt->error);
 				//get the result, if it doesn't exist, the result is 0
 			    $result = $stmt->get_result();
-
 			
 				// get the current review_id being updated in the review table, then get the matching fields in the row
 				$query2 = "SELECT * FROM review WHERE review_id = ?";
@@ -38,7 +36,7 @@ require('dbConnect.php');
 			    $result2 = $stmt2->get_result();
 			
 				while ($row = $result2->fetch_assoc()) {
-				//get the corresponding user_id and cat_id in the review table row of the current review
+				//get the corresponding user_id and cat_id in the review table row of the current cat_id
 				$user_id = $row["user_id"];
 				$cat_name= $row["cat_name"];
 				$cat_id = $row["cat_id"];
@@ -96,7 +94,71 @@ require('dbConnect.php');
 							$stmt4->execute() or die ("problem here ".$stmt4->error); 
 			
 							echo "review updated succesfully" . "\n";
-
+							
+							//also update the review_shared table
+							
+							//**************INSERT INTO review_shared******************
+					
+					//for each time a contact in the listview is checked we want to put it in the review_shared table :
+					//the review_shared_id (which is AUTO_INCREMENT), the cat_id, the review_id, the corresponding user_id, the
+					//contact_id, and the username, which is the checkedcontact in Android				
+									
+					//review_shared_id is AUTO_INCREMENT
+					//we need the cat_id, which is $last_id
+					//we need the review_id, which is $last_id2
+					//we need the user_id, which is $user_id
+					//we need the contact_id, which is $user_id
+					
+					//post the json array of checked contacts, checkedContacts, from NewContact in my phone to this php page. 
+					//Let's call the php-side json array $jsoncheckedContacts
+					//$_POST['checkedContacts'] is Android side, of the form [{"checkedContact":"+3531234567"},{"checkedContact":"+353868132813"}]
+					$jsoncheckedContacts = $_POST['checkedContacts'];
+					
+					echo "checked contacts are " . $jsoncheckedContacts;
+					
+					
+		/* 			//decode the JSON array
+					$arraycheckedContacts = json_decode($jsoncheckedContacts);
+					
+							 //for each checkedcontact posted from Android call it $checkedContact
+							foreach ($arraycheckedContacts as $value)
+					
+								{
+									
+								//and the value we want to extract from the JSON Array is called checkedContact (it's the only key
+								//in the JSON Array). JSONArray posted from Android is of the form, 
+								//[{"checkedContact":"+353123456"},{"checkedContact":"+353567890"}....]
+								$checkedContact = $value->checkedContact;
+					
+								//So $checkedContact will be a phone number, like +353872934480. Now we want to get the corresponding 
+								//user_id in the user table for the phone number, and we want to insert this as contact_id into review_shared
+								
+								// select the username in the user table and get the matching user_id
+								$query5 = "SELECT * FROM user WHERE username = ?";
+								$stmt5 = $con->prepare($query5) or die(mysqli_error($con));
+								$stmt5->bind_param('s', $checkedContact) or die ("Binding failed on $checkedContact ".$stmt5->error);
+								$stmt5->execute() or die ("MySQLi-stmt execute failed ".$stmt5->error);
+								$result5 = $stmt5->get_result();
+				
+								while ($row = $result5->fetch_assoc()) {
+								//get the corresponding user_id in the row
+								//this is the matching user_id in the user table of username
+								$contact_id = $row["user_id"];
+								$checkedContact = $row["username"];
+								//echo $user_id;
+								
+								}
+			
+					$stmt3 = $con->prepare("INSERT INTO review_shared (cat_id, review_id, user_id, contact_id, username) VALUES(?,?,?,?,?)") or die(mysqli_error($con));
+					$stmt3->bind_param('iiiis', $last_id, $last_id2, $user_id, $contact_id,$checkedContact) or die ("MySQLi-stmt binding failed ".$stmt3->error);
+					$stmt3->execute() or die ("MySQLi-stmt execute failed ".$stmt3->error);
+					}
+			
+					echo $jsoncheckedContacts;
+							 */
+							
+							
+							
 								
 									}
 									
@@ -122,110 +184,12 @@ require('dbConnect.php');
 			
 							//also update the review_shared table
 							
-
 							}		
 									
 									
-							//also update the review_shared table
-							
-							//**************INSERT INTO review_shared******************
-					
-							//for each time a contact in the listview is checked we want to put it in the review_shared table :
-							//the review_shared_id (which is AUTO_INCREMENT), the cat_id, the review_id, the corresponding user_id, the
-							//contact_id, and the username, which is the checkedcontact in Android				
-									
-							//review_shared_id is AUTO_INCREMENT
-							//we need the cat_id, which is $last_id
-							//we need the review_id, which is $last_id2
-							//we need the user_id, which is $user_id
-							//we need the contact_id, which is $user_id
-					
-							//post the json array of checked contacts, checkedContacts, from NewContact in my phone to this php page. 
-							//Let's call the php-side json array $jsoncheckedContacts
-							//$_POST['checkedContacts'] is Android side, of the form [{"checkedContact":"+3531234567"},{"checkedContact":"+353868132813"}]
-							$jsoncheckedContacts = $_POST['checkedContacts'];
-					
-							echo "checked contacts are " . $jsoncheckedContacts;
-					
-							// delete all the review_ids in the review_shared table and all the matching fields in the row
-							//we do this before adding the new checkedcontacts, which the user is editing
-							$query = "DELETE FROM review_shared WHERE review_id = ?";
-							$stmt = $con->prepare($query) or die(mysqli_error($con));
-							$stmt->bind_param('i', $Review_id) or die ("MySQLi-stmt binding failed  ".$stmt->error);
-							$stmt->execute() or die ("MySQLi-stmt binding failed  ".$stmt->error);
-					
-					
-							//decode the JSON array
-							$arraycheckedContacts = json_decode($jsoncheckedContacts);
-					
-							 //for each checkedcontact posted from Android...
-							foreach ($arraycheckedContacts as $value)
-					
-								{
-									
-								//and the value we want to extract from the JSON Array is called checkedContact (it's the only key
-								//in the JSON Array). JSONArray posted from Android is of the form, 
-								//[{"checkedContact":"+353123456"},{"checkedContact":"+353567890"}....]
-								$checkedContact = $value->checkedContact;
-					
-								//So $checkedContact will be a phone number, the username of the contact, like +353872934480. Now we want to get the corresponding 
-								//user_id in the user table, and we want to insert this as contact_id into review_shared
-								
-								// select the username, the phonenumber of the contact, in the user table and get the matching user_id
-								$query5 = "SELECT * FROM user WHERE username = ?";
-								$stmt5 = $con->prepare($query5) or die(mysqli_error($con));
-								$stmt5->bind_param('s', $checkedContact) or die ("Binding failed on $checkedContact ".$stmt5->error);
-								$stmt5->execute() or die ("MySQLi-stmt execute failed ".$stmt5->error);
-								$result5 = $stmt5->get_result();
-				
-								while ($row = $result5->fetch_assoc()) {
-								//get the corresponding user_id in the row
-								//this is the matching user_id in the user table of username
-								$contact_id = $row["user_id"];
-								$checkedContact = $row["username"];
-								//echo $user_id;
-								
-									}
-								
-								
-								//Back to SCENARIO 1.1 - The CURRENT CAT_NAME is only being used in this current review_id
-								//so we have replaced it with the new BEING-UPDATED-TO CATEGORY name.
-								//We have deleted all the review_ids in the review_shared table and now we 
-								//will insert the new checkedcontacts
-								If ($review_count==0) {
-			
-									$stmt3 = $con->prepare("INSERT INTO review_shared (cat_id, review_id, user_id, contact_id, username) VALUES(?,?,?,?,?)") or die(mysqli_error($con));
-									$stmt3->bind_param('iiiis', $cat_id, $Review_id, $user_id, $contact_id,$checkedContact) or die ("MySQLi-stmt binding failed ".$stmt3->error);
-									$stmt3->execute() or die ("MySQLi-stmt execute failed ".$stmt3->error);
-									
-									}
-					
-									else {
-									//Back to SCENARIO 1.2 - The CURRENT CAT_NAME is being used in more than just this
-									//current review, we have created a new cat_name and cat_id for the BEING-UPDATED-TO CATEGORY
-									//We have deleted all the review_ids in the review_shared table. now we 
-									//will insert the new checkedcontacts. Using $last_id, which is the id for the 
-									//BEING-UPDATED-TO CATEGORY 
-									$stmt3 = $con->prepare("INSERT INTO review_shared (cat_id, review_id, user_id, contact_id, username) VALUES(?,?,?,?,?)") or die(mysqli_error($con));
-									$stmt3->bind_param('iiiis', $last_id, $Review_id, $user_id, $contact_id,$checkedContact) or die ("MySQLi-stmt binding failed ".$stmt3->error);
-									$stmt3->execute() or die ("MySQLi-stmt execute failed ".$stmt3->error);
-									
-									echo "we are going to update the review_shared table" . "\n";
-						
-										}
-									}
-
-			
-								//echo $jsoncheckedContacts;		
 									
 									
-									
-									
-									
-									
-									
-									
-									}
+							}
 							
 					//SCENARIO 2 ************* 
 					//If the BEING-UPDATED-TO CATEGORY name does exist already in the category table...
@@ -256,7 +220,6 @@ require('dbConnect.php');
 								//get the result, if it doesn't exist, the result is 0
 								$result = $stmt->get_result();
 								echo $cat_id; */
-
 								
 /* 								//search the category table for the current cat_name. 
 								$stmt5 = $con->prepare("UPDATE category SET cat_name=?,cat_id=? WHERE cat_id=?") or die(mysqli_error($con));
@@ -271,12 +234,9 @@ require('dbConnect.php');
 					
 				//	}
 					
-
-
 				
 				//echo "nothing with the updated-to category";
 				//echo "the review_shared result is " . $user_id2;
-
 				//}
 			
 				//SCENARIO 2 *************
@@ -288,7 +248,6 @@ require('dbConnect.php');
 				//get the corresponding cat_id in the row
 				//this is the matching cat_id in the category table of cat_name
 			    $cat_id2 = $row["cat_id"];
-
 				}
 				//update the review with updated-to category name and the cat_id, and also update the other review details
 				$stmt = $con->prepare("UPDATE review SET cat_id=?, cat_name=?, name=?, phone=?, address=?, comment=? WHERE Review_id=?") or die(mysqli_error($con));
@@ -300,11 +259,7 @@ require('dbConnect.php');
 				} */
 				
 			
-
 	
-
-
-
 				
 			   //if the category is not already in the category table, then put it in there.
 			   // Get the cat_id and user_id from the review table
@@ -328,9 +283,7 @@ require('dbConnect.php');
 				//then add a new cat_id and category name
 				
 				
-
 				
-
 					
 				//then put it in */
 			
@@ -376,7 +329,6 @@ require('dbConnect.php');
 			   
 			   	
 				
-
 				//}
 				
 				//else {

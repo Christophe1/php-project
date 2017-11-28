@@ -4,10 +4,10 @@
 
 	require('dbConnect.php');
 	   
-	//we are making a new contact, so we need to put in the user_id of the user making the contact
-	//post the phone number of the user, which in the user table is username
+	//we are making a new contact, so to do this we can post the user_id of the user making the contact
+	//to do this, post the phone number of the user, which in the user table is username, and get associated details
 
-	//received from app
+	//received from app, the phonenumber, which in the DB is username
 	$Number = $_POST['phonenumberofuser'];
 
 				//now we need to get the matching user_id
@@ -38,6 +38,8 @@
 				// AUTO_INCREMENT does not need prepared statements
 
 				// select to see if the category exists in the category table
+				
+				//$query = "SELECT COUNT(*) AS rowcount FROM category WHERE cat_name = ?";
 				$query = "SELECT * FROM category WHERE cat_name = ?";
 				$stmt = $con->prepare($query) or die(mysqli_error($con));
 				$stmt->bind_param('s', $category) or die ("MySQLi-stmt binding failed ".$stmt->error);
@@ -57,6 +59,7 @@
 							$stmt3->execute() or die ("MySQLi-stmt execute failed ".$stmt3->error);
 							//last_id is the last AUTO_INCREMENT id inserted into the category table; that is, cat_id
 							$last_id = $con->insert_id;
+							echo "the category doesn't exist" . "\n";
 							}
 				
 					else {
@@ -74,13 +77,15 @@
 							while ($row = $result4->fetch_assoc()) {
 							//get the corresponding cat_id in the row
 							//this is the matching cat_id in the category table of cat_name
-							$last_id = $row["cat_id"];
+							$last_id = $row["cat_id"]; 
+							echo "the category does indeed exist" . "\n";
 							//echo $user_id;
 								}
+								//echo $category;
 					
 							}
 
-					//received from app
+					 //received from app
 
 					$name = $_POST["name"];
 					$phone = $_POST["phone"];
@@ -154,6 +159,6 @@
 					}
 
 			
-					echo $jsoncheckedContacts;
+					echo $jsoncheckedContacts; 
 					
 		?>
