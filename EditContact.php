@@ -126,6 +126,75 @@ require('dbConnect.php');
 							}		
 									
 									
+
+									}
+							
+							//SCENARIO 2 ************* 
+							//If the BEING-UPDATED-TO CATEGORY name does exist already in the category table...		
+							If ($result->num_rows > 0) {
+								
+									//we want to get the cat_id of the already existing BEING-UPDATED-TO CATEGORY.
+									//Then we will update the CURRENT CATEGORY to that.
+					
+									//get associated fields of the BEING-UPDATED-TO CATEGORY that already exists
+									while ($row = $result->fetch_assoc()) {
+									//get the corresponding cat_id in the row
+									//this is the matching cat_id in the category table of BEING-UPDATED-TO CATEGORY name
+									$updated_cat_id= $row["cat_id"]; 
+									echo "the category does indeed exist" . "\n";
+									echo "updated cat that already exists:" . $updated_cat_id;
+
+									}
+								
+								
+									//SCENARIO 2.1 ************* 
+									//The CURRENT CAT ID is being used only in this review
+									//If $review_count, the number of reviews the CURRENT CAT_NAME is being used in,
+									//is 0, then the cat_id is only being used in this current review_id 
+							
+							        //OR, if the BEING-UPDATED-TO category is equal to the CURRENT category
+									If ($review_count==0 OR $category == $cat_name) {
+									//Then delete the category from the Category table, no point having it 
+									//lingering around	
+
+									$query = "DELETE FROM category WHERE cat_id = ?";
+									$stmt = $con->prepare($query) or die(mysqli_error($con));
+									$stmt->bind_param('i', $cat_id) or die ("MySQLi-stmt binding failed  ".$stmt->error);
+									$stmt->execute() or die ("MySQLi-stmt binding failed  ".$stmt->error);
+													
+									//We know the BEING-UPDATED-TO CATEGORY already exists in the category table, so just 
+									//update the current review with it in the review table. 
+									//For the cat_id value, we want to update to $updated_cat_id, which is the cat_id of the //BEING-UPDATED-TO CATEGORY that already exists
+					
+									$stmt4 = $con->prepare("UPDATE review SET cat_id=?, cat_name=?, name=?, phone=?, address=?, comment=?, public_or_private=? WHERE Review_id=?") or die(mysqli_error($con));
+									$stmt4->bind_param('isssssii', $updated_cat_id, $category, $name, $phone, $address, $comment, $public_or_private, $Review_id ) or die ("problem here ".$stmt4->error);
+									$stmt4->execute() or die ("problem here ".$stmt4->error); 
+					
+									echo "current Category only exists in this review" . "\n";
+
+									}
+									
+									//SCENARIO 2.2*********** 
+									//The CURRENT CAT_NAME is being used in more than just this
+									//current review. A cat_id for the BEING-UPDATED-TO CATEGORY already exists.
+									//We want to keep the CURRENT CAT_NAME and CAT_ID in the Category table.
+									//So leave the Category table as is.
+									//And update this current review with 
+									//BEING-UPDATED-TO CATEGORY name and BEING-UPDATED-TO CATEGORY id
+
+									else {
+											
+									$stmt4 = $con->prepare("UPDATE review SET cat_id=?, cat_name=?, name=?, phone=?, address=?, comment=?, public_or_private=? WHERE Review_id=?") or die(mysqli_error($con));
+									$stmt4->bind_param('isssssii', $updated_cat_id, $category, $name, $phone, $address, $comment, $public_or_private, $Review_id ) or die ("problem here ".$stmt4->error);
+									$stmt4->execute() or die ("problem here ".$stmt4->error); 
+					
+									echo "current Category exists in multiple reviews" . "\n";
+									}
+							}
+							
+							
+							
+									
 							//also update the review_shared table
 							
 							//**************INSERT INTO review_shared******************
@@ -192,7 +261,8 @@ require('dbConnect.php');
 								//so we have replaced it with the new BEING-UPDATED-TO CATEGORY name.
 								//We have deleted all the review_ids in the review_shared table and now we 
 								//will insert the new checkedcontacts
-								If ($review_count==0) {
+								
+								If ($review_count==0 OR $category <> $cat_name) {
 			
 									$stmt3 = $con->prepare("INSERT INTO review_shared (cat_id, review_id, user_id, contact_id, username) VALUES(?,?,?,?,?)") or die(mysqli_error($con));
 									$stmt3->bind_param('iiiis', $cat_id, $Review_id, $user_id, $contact_id,$checkedContact) or die ("MySQLi-stmt binding failed ".$stmt3->error);
@@ -217,74 +287,6 @@ require('dbConnect.php');
 
 			
 									//echo $jsoncheckedContacts;		
-									
-
-									}
-							
-							//SCENARIO 2 ************* 
-							//If the BEING-UPDATED-TO CATEGORY name does exist already in the category table...		
-							If ($result->num_rows > 0) {
-								
-									//we want to get the cat_id of the already existing BEING-UPDATED-TO CATEGORY.
-									//Then we will update the CURRENT CATEGORY to that.
-					
-									//get associated fields of the BEING-UPDATED-TO CATEGORY that already exists
-									while ($row = $result->fetch_assoc()) {
-									//get the corresponding cat_id in the row
-									//this is the matching cat_id in the category table of BEING-UPDATED-TO CATEGORY name
-									$updated_cat_id= $row["cat_id"]; 
-									echo "the category does indeed exist" . "\n";
-									echo "updated cat that already exists:" . $updated_cat_id;
-
-									}
-								
-								
-									//SCENARIO 2.1 ************* 
-									//The CURRENT CAT ID is being used only in this review
-									//If $review_count, the number of reviews the CURRENT CAT_NAME is being used in,
-									//is 0, then the cat_id is only being used in this current review_id 
-							
-									If ($review_count==0) {
-									//Then delete the category from the Category table, no point having it 
-									//lingering around	
-
-									$query = "DELETE FROM category WHERE cat_id = ?";
-									$stmt = $con->prepare($query) or die(mysqli_error($con));
-									$stmt->bind_param('i', $cat_id) or die ("MySQLi-stmt binding failed  ".$stmt->error);
-									$stmt->execute() or die ("MySQLi-stmt binding failed  ".$stmt->error);
-													
-									//We know the BEING-UPDATED-TO CATEGORY already exists in the category table, so just 
-									//update the current review with it in the review table. 
-									//For the cat_id value, we want to update to $updated_cat_id, which is the cat_id of the //BEING-UPDATED-TO CATEGORY that already exists
-					
-									$stmt4 = $con->prepare("UPDATE review SET cat_id=?, cat_name=?, name=?, phone=?, address=?, comment=?, public_or_private=? WHERE Review_id=?") or die(mysqli_error($con));
-									$stmt4->bind_param('isssssii', $updated_cat_id, $category, $name, $phone, $address, $comment, $public_or_private, $Review_id ) or die ("problem here ".$stmt4->error);
-									$stmt4->execute() or die ("problem here ".$stmt4->error); 
-					
-									echo "current Category only exists in this review" . "\n";
-
-									}
-									
-									//SCENARIO 2.2*********** 
-									//The CURRENT CAT_NAME is being used in more than just this
-									//current review. A cat_id for the BEING-UPDATED-TO CATEGORY already exists.
-									//We want to keep the CURRENT CAT_NAME and CAT_ID in the Category table.
-									//So leave the Category table as is.
-									//And update this current review with 
-									//BEING-UPDATED-TO CATEGORY name and BEING-UPDATED-TO CATEGORY id
-
-									else {
-											
-									$stmt4 = $con->prepare("UPDATE review SET cat_id=?, cat_name=?, name=?, phone=?, address=?, comment=?, public_or_private=? WHERE Review_id=?") or die(mysqli_error($con));
-									$stmt4->bind_param('isssssii', $updated_cat_id, $category, $name, $phone, $address, $comment, $public_or_private, $Review_id ) or die ("problem here ".$stmt4->error);
-									$stmt4->execute() or die ("problem here ".$stmt4->error); 
-					
-									echo "current Category exists in multiple reviews" . "\n";
-									}
-							}
-							
-							
-							
 							
 							
 								//REDUNDANT BELOW I THINK
