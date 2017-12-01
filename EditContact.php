@@ -119,9 +119,7 @@ require('dbConnect.php');
 							$stmt4 = $con->prepare("UPDATE review SET cat_id=?, cat_name=?, name=?, phone=?, address=?, comment=?, public_or_private=? WHERE Review_id=?") or die(mysqli_error($con));
 							$stmt4->bind_param('isssssii', $last_id, $category, $name, $phone, $address, $comment, $public_or_private, $Review_id ) or die ("MySQLi-stmt binding failed ".$stmt4->error);
 							$stmt4->execute() or die ("MySQLi-stmt execute failed ".$stmt4->error); 
-			
-							//also update the review_shared table
-							
+						
 
 							}		
 									
@@ -149,11 +147,14 @@ require('dbConnect.php');
 								
 									//SCENARIO 2.1 ************* 
 									//The CURRENT CAT ID is being used only in this review
-									//If $review_count, the number of reviews the CURRENT CAT_NAME is being used in,
-									//is 0, then the cat_id is only being used in this current review_id 
+									//We know this because if $review_count, the number of reviews the 
+									//CURRENT CAT_NAME is being used in,
+									//is 0, then this means the cat_id is only being used in this current review_id 
 							
-							        //OR, if the BEING-UPDATED-TO category is equal to the CURRENT category
-									If ($review_count==0 OR $category == $cat_name) {
+							        //AND, also, if the BEING-UPDATED-TO category is not equal to the CURRENT category
+									//then we want to delete CURRENT CAT_NAME from the Category table
+									
+									If ($review_count==0 && $category <> $cat_name) {
 									//Then delete the category from the Category table, no point having it 
 									//lingering around	
 
@@ -176,11 +177,10 @@ require('dbConnect.php');
 									
 									//SCENARIO 2.2*********** 
 									//The CURRENT CAT_NAME is being used in more than just this
-									//current review. A cat_id for the BEING-UPDATED-TO CATEGORY already exists.
-									//We want to keep the CURRENT CAT_NAME and CAT_ID in the Category table.
-									//So leave the Category table as is.
-									//And update this current review with 
-									//BEING-UPDATED-TO CATEGORY name and BEING-UPDATED-TO CATEGORY id
+									//current review. So don't delete it from the Category table.
+									//A cat_id for the BEING-UPDATED-TO CATEGORY already exists.
+									//Update this current review with the already existing
+									//BEING-UPDATED-TO CATEGORY id
 
 									else {
 											
@@ -255,14 +255,16 @@ require('dbConnect.php');
 								//echo $user_id;
 								
 									}
+									
+									//Back to SCENARIO 1 ************* 
+									//If the BEING-UPDATED-TO CATEGORY name doesn't exist in the category table...
+									If ($result->num_rows == 0) {
+										
+																		
+								//SCENARIO 1.1 - The CURRENT CAT_NAME is only being used in this current review_id
+								//will insert the new checkedcontacts 
 								
-								
-								//Back to SCENARIO 1.1 - The CURRENT CAT_NAME is only being used in this current review_id
-								//so we have replaced it with the new BEING-UPDATED-TO CATEGORY name.
-								//We have deleted all the review_ids in the review_shared table and now we 
-								//will insert the new checkedcontacts
-								
-								If ($review_count==0 OR $category <> $cat_name) {
+								If ($review_count==0) {
 			
 									$stmt3 = $con->prepare("INSERT INTO review_shared (cat_id, review_id, user_id, contact_id, username) VALUES(?,?,?,?,?)") or die(mysqli_error($con));
 									$stmt3->bind_param('iiiis', $cat_id, $Review_id, $user_id, $contact_id,$checkedContact) or die ("MySQLi-stmt binding failed ".$stmt3->error);
@@ -283,6 +285,45 @@ require('dbConnect.php');
 									echo "we are going to update the review_shared table" . "\n";
 						
 										}
+										
+										
+									}
+									//Back to SCENARIO 2,  the BEING-UPDATED-TO CATEGORY already exists*********** 
+									If ($result->num_rows > 0) {
+										
+									//SCENARIO 2.1	
+									//The CURRENT CAT ID is being used only in this review
+									//If $review_count, the number of reviews the CURRENT CAT_NAME is being used in,
+									//is 0, then we know the cat_id is only being used in this current review_id 
+							
+									//Update this current review with 
+									//BEING-UPDATED-TO CATEGORY id	
+									If ($review_count==0) {
+									$stmt3 = $con->prepare("INSERT INTO review_shared (cat_id, review_id, user_id, contact_id, username) VALUES(?,?,?,?,?)") or die(mysqli_error($con));
+									$stmt3->bind_param('iiiis', $updated_cat_id, $Review_id, $user_id, $contact_id,$checkedContact) or die ("MySQLi-stmt binding failed ".$stmt3->error);
+									$stmt3->execute() or die ("MySQLi-stmt execute failed ".$stmt3->error);
+									
+									}
+										
+									else {
+									//Back to SCENARIO 2.2 - The CURRENT CAT_NAME is being used in more than just this
+									//current review,
+									//we will insert the new checkedcontacts using $updated_cat_id, which is the id for the 
+									//BEING-UPDATED-TO CATEGORY which has already exisited
+									$stmt3 = $con->prepare("INSERT INTO review_shared (cat_id, review_id, user_id, contact_id, username) VALUES(?,?,?,?,?)") or die(mysqli_error($con));
+									$stmt3->bind_param('iiiis', $updated_cat_id, $Review_id, $user_id, $contact_id,$checkedContact) or die ("MySQLi-stmt binding failed ".$stmt3->error);
+									$stmt3->execute() or die ("MySQLi-stmt execute failed ".$stmt3->error);
+									
+									echo "we are going to update the review_shared table" . "\n";
+						
+										}
+										
+										
+										
+										
+									}
+								
+
 									}
 
 			
