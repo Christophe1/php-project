@@ -5,14 +5,30 @@ error_reporting(E_ALL);
 
 require('dbConnect.php');
 
-$test = $_POST['jsonarray'];
+$user_id = $_POST['jsonarray'];
+//$contact_id = 37;
+$id_list = array(1,2,7);
+$id_list2 = implode(',', $id_list);
 
+                
+				$query5 = "DELETE FROM test_table WHERE user_id = ? AND contact_id NOT IN ($id_list2)";
+
+                //$query5 = "DELETE FROM contacts WHERE user_id = ? AND contact_id = ?";
+				$stmt5 = $con->prepare($query5) or die(mysqli_error($con));
+				$stmt5->bind_param('i', $user_id) or die ("MySQLi-stmt binding failed ".$stmt5->error);
+
+				//$stmt5->bind_param('ii', $user_id, $contact_id) or die ("MySQLi-stmt binding failed ".$stmt5->error);
+				$stmt5->execute() or die ("MySQLi-stmt execute failed ".$stmt5->error);
+				$stmt5->close();  
+				
+				echo "done";
+
+//**************THIS IS FOR INSERTING A PHONE NUMBER INTO USER TABLE *************************
+
+
+/* $test = $_POST['jsonarray'];
 
 $data = json_decode($test);
-//$array = json_decode($test);
-
-//$data = $array->myarray;
-//$data = $array->myarray;
 
 $id_list = implode(",", array_map(function ($val) { return (int) $val->id; }, $data));
 
@@ -30,7 +46,7 @@ echo $id_list;
 //var_dump $obj;
 //print_r($array);
 print_r($data);
-
+ */
 /* [ { "id": 1, "name": "Harry" },     { "id": 2, "name": "Ron" },     { "id": 3, "name": "Hermione" },     { "id": 4, "name": "Neville" } ]
 
 [ { "id": 1 },     { "id": 2},     { "id": 3 },     { "id": 4 } ] */
