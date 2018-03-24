@@ -23,7 +23,7 @@ $Review_id = $_POST['review_id'];
 				$cat_name= $row["cat_name"];
 				$cat_id = $row["cat_id"];
 				
-											//check if other reviews with CURRENT CAT_NAME have been created.
+							//check if other reviews with CURRENT CAT_NAME have been created.
 							//we can get this info in the review_shared table
 							
 							//check to see if the CURRENT CAT_NAME is being used in more than just this review being updated
@@ -51,6 +51,8 @@ $Review_id = $_POST['review_id'];
 										$stmt->bind_param('i', $cat_id) or die ("MySQLi-stmt binding failed  ".$stmt->error);
 										$stmt->execute() or die ("MySQLi-stmt binding failed  ".$stmt->error);
 										}
+										
+				}
 				
 
 // The ? below are parameter markers used for variable binding
@@ -64,7 +66,7 @@ $Review_id = $_POST['review_id'];
 			    //$result = $stmt->get_result();
 				
 				
-											// delete all the review_ids in the review_shared table and all the matching fields in the row
+							// delete all the review_ids in the review_shared table and all the matching fields in the row
 							//we do this before adding the new checkedcontacts, which the user is editing
 							$query = "DELETE FROM review_shared WHERE review_id = ?";
 							$stmt = $con->prepare($query) or die(mysqli_error($con));
@@ -72,11 +74,6 @@ $Review_id = $_POST['review_id'];
 							$stmt->execute() or die ("MySQLi-stmt binding failed  ".$stmt->error);
 					
 			
-echo "deleted succesfully";
+echo "deleted succesfully"; 
 
-
-
-
-
-
-		?>
+?>

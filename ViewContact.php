@@ -5,6 +5,7 @@
 <?php
 
 require('dbConnect.php');
+//this php file enables us to see a phone owner's specific review, based on review_id.
 
 //this is the review_id of the ViewContact class, received from the PopulistoListView class
 $Review_id = $_POST['review_id'];
