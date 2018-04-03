@@ -23,7 +23,7 @@ require('dbConnect.php');
 				$user_id = $row["user_id"];
 			
 				//here is the user_id, which is the corresponding user_id for username +353864677745
-				echo $user_id;
+				echo $user_id; 
 				} */
 
 			$user_id = "21";
@@ -53,17 +53,48 @@ require('dbConnect.php');
 
 				//make an array called $results
 				$results[$row['cat_id']][] = $review_id; 
-				
-				//echo count($results[$row['cat_id']]) . ",";
-				
+								
 				}
+				
+				//**********************
+				
+			//select all rows where public_or_private column = 2
+			//in review table
+			$sql2 = "SELECT * FROM review WHERE public_or_private = 2";
+			//$stmt2 = $con->prepare($sql) or die(mysqli_error($con));
+			//$stmt2->bind_param('i', $user_id) or die ("MySQLi-stmt binding failed ".$stmt2->error);
+			//$stmt2->execute() or die ("MySQLi-stmt execute failed ".$stmt2->error);
+			$result2 = mysqli_query($con,$sql2);
+			
+				//fetch all associated rows where public_or_private column = 2
+			    while ($row = $result2->fetch_assoc()) {
 					
+				//get the corresponding review_id in the row
+				$public_review_id = $row["review_id"];
+				
+				//get the corresponding cat_id in the row
+				$cat_id2 = $row["cat_id"];	
+				
+				$results3[] = array(
+				
+					//get the corresponding cat_name in the row
+					'category' => $cat_id2, 
+					'public_review_id' => $public_review_id,
+					);
+				
+				//echo $review_id_public . ",";
+
+				}
+				
+				echo json_encode($results3);
+				
+				
+			//*************************		
 			$jsonData = array_map(function($catId) use ($results) {
 			return [
 					'category' => $catId,
-					'count' => count($results[$catId]),
-					'review_ids' => $results[$catId]
-					
+					'private_review_ids' => $results[$catId],
+					'public_review_ids' => "??"
 					];
 			}, array_keys($results));
 
