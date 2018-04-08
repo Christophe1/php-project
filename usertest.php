@@ -30,69 +30,38 @@ require('dbConnect.php');
 			//$user_id = "21";
 			//Select all related info in the review_shared table 
 			//where the contact_id column is equal to $user_id.
-	
+				
 			//a value in the contact_id column means a review is shared with a person, $user_name,
 			//who owns that number, $user_id
 			//we are joining the review_shared table with the category table, so we can instantly get the category name
-			$sql = "SELECT * FROM review_shared INNER JOIN category ON review_shared.cat_id = category.cat_id WHERE review_shared.contact_id = ?";
+			$sql = "SELECT * FROM review_shared INNER JOIN category ON review_shared.cat_id = category.cat_id WHERE review_shared.user_id = ?";
 			$stmt2 = $con->prepare($sql) or die(mysqli_error($con));
 			$stmt2->bind_param('i', $user_id) or die ("MySQLi-stmt binding failed ".$stmt2->error);
 			$stmt2->execute() or die ("MySQLi-stmt execute failed ".$stmt2->error);
 			
-			$privateReviews = $stmt2->get_result();
+			$userPersonalReviews = $stmt2->get_result();
 			
-			//select all rows where public_or_private column = 2 in review table
-			//we are joining with the category table, so we can instantly get the category name
-			$sql2 = "SELECT * FROM review INNER JOIN category ON review.cat_id = category.cat_id WHERE review.public_or_private = 2";
+			//$privateReviews = mysqli_query($con,$sql);
 			
-			$publicReviews = mysqli_query($con,$sql2);
-			
-			// Prepare combined reviews array
-			$reviews = [];
-			
-			
-			// Iterate through private review results and append to combined reviews
-				while (($row = $privateReviews->fetch_assoc())) {
+				// Iterate through user personal review results and append to combined reviews
+				while (($row = $userPersonalReviews->fetch_assoc())) {
+				//$category_id = $row['cat_name'];
+				
+				//$review_id = $row['review_id'];
 				$category_id = $row['cat_name'];
-			
-				$review_id = $row['review_id'];
+				//$contact_id = $row['contact_id'];
 				
 				//each JSON object will be of form
 				//{"cat_name":VARCHAR,"private_review_ids":[INT,],"public_review_ids":[INT,],"private_count":INT,"public_count":INT}
-				$reviews[$category_id]['cat_name'] = $category_id;
-				
-							
+				/* $reviews[$category_id]['cat_name'] = $category_id;
 				$reviews[$category_id]['private_review_ids'][] = $review_id;
 				$reviews[$category_id]['public_review_ids'] = [];
 				$reviews[$category_id]['private_count'] = count($reviews[$category_id]['private_review_ids']);
-				$reviews[$category_id]['public_count'] = count($reviews[$category_id]['public_review_ids']);
+				$reviews[$category_id]['public_count'] = count($reviews[$category_id]['public_review_ids']); */
+				echo $category_id;
 
 				}
-
-				// Iterate through public review results and append to combined reviews
-				while (($row = $publicReviews->fetch_assoc())) {
-				$category_id = $row['cat_name'];
 				
-				$review_id = $row['review_id'];
-
-				$reviews[$category_id]['cat_name'] = $category_id;
-
-					// Create empty private reviews array, where it doesn't exist
-					if (! isset($reviews[$category_id]['private_review_ids'])) {
-					$reviews[$category_id]['private_review_ids'] = [];
-					$reviews[$category_id]['private_count'] = count($reviews[$category_id]['private_review_ids']);
-					}
-
-					// Add review id to public reviews where it doesn't exist in private reviews
-					if (! in_array($review_id, $reviews[$category_id]['private_review_ids'])) {
-					$reviews[$category_id]['public_review_ids'][] = $review_id;
-					$reviews[$category_id]['public_count'] = count($reviews[$category_id]['public_review_ids']);
-
-					}
-				}
-				
-
-			echo json_encode(array_values($reviews)); 
-
-?>
-				
+				//echo $contact_id;
+			
+			?>
