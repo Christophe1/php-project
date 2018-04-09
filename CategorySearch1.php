@@ -59,8 +59,8 @@ require('dbConnect.php');
 							
 				$reviews[$category_id]['private_review_ids'][] = $review_id;
 				$reviews[$category_id]['public_review_ids'] = [];
-				$reviews[$category_id]['private_count'] = count($reviews[$category_id]['private_review_ids']);
-				$reviews[$category_id]['public_count'] = count($reviews[$category_id]['public_review_ids']);
+				//$reviews[$category_id]['private_count'] = count($reviews[$category_id]['private_review_ids']);
+				//$reviews[$category_id]['public_count'] = count($reviews[$category_id]['public_review_ids']);
 				}
 				// Iterate through public review results and append to combined reviews
 				while (($row = $publicReviews->fetch_assoc())) {
@@ -71,12 +71,12 @@ require('dbConnect.php');
 					// Create empty private reviews array, where it doesn't exist
 					if (! isset($reviews[$category_id]['private_review_ids'])) {
 					$reviews[$category_id]['private_review_ids'] = [];
-					$reviews[$category_id]['private_count'] = count($reviews[$category_id]['private_review_ids']);
+					//$reviews[$category_id]['private_count'] = count($reviews[$category_id]['private_review_ids']);
 					}
 					// Add review id to public reviews where it doesn't exist in private reviews
 					if (! in_array($review_id, $reviews[$category_id]['private_review_ids'])) {
 					$reviews[$category_id]['public_review_ids'][] = $review_id;
-					$reviews[$category_id]['public_count'] = count($reviews[$category_id]['public_review_ids']);
+					//$reviews[$category_id]['public_count'] = count($reviews[$category_id]['public_review_ids']);
 					}
 				}
 				
