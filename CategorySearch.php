@@ -2,9 +2,9 @@
 require('dbConnect.php');
 
 			//this is me, my username in the user table
-			//$Number = $_POST['phonenumberofuser'];
+			$Number = $_POST['phonenumberofuser'];
 			//$Number = "+353872934480";
-			$Number = "+353864677745";
+			//$Number = "+353864677745";
 
 			// The ? below are parameter markers used for variable binding
 			// auto increment does not need prepared statements
@@ -72,9 +72,13 @@ require('dbConnect.php');
 				//whatever review ids satisfy the $userPersonalReviews->fetch_assoc
 				//condition  then put then review_id in user_personal_review_ids array
 				$reviews[$category_id]['cat_name'] = $category_id;
-				$reviews[$category_id]['user_personal_review_ids'][] = $review_id;
+				$reviews[$category_id]['user_review_ids'][] = $review_id;
 				$reviews[$category_id]['private_review_ids'] = [];
 				$reviews[$category_id]['public_review_ids'] = [];
+				$reviews[$category_id]['user_personal_count'] = count($reviews[$category_id]['user_review_ids']);
+				$reviews[$category_id]['private_count'] = count($reviews[$category_id]['private_review_ids']);
+				$reviews[$category_id]['public_count'] = count($reviews[$category_id]['public_review_ids']);
+
 
 				}
 			
@@ -91,19 +95,23 @@ require('dbConnect.php');
 
 					//if nothing has been set for user_personal_review_ids
 					//then set it to be an empty array
-					if (! isset($reviews[$category_id]['user_personal_review_ids'])) {
-					$reviews[$category_id]['user_personal_review_ids'] = [];
+					if (! isset($reviews[$category_id]['user_review_ids'])) {
+					$reviews[$category_id]['user_review_ids'] = [];
+					$reviews[$category_id]['user_personal_count'] = count($reviews[$category_id]['user_review_ids']);
+					$reviews[$category_id]['private_count'] = count($reviews[$category_id]['private_review_ids']);
+					$reviews[$category_id]['public_count'] = count($reviews[$category_id]['public_review_ids']);					
 					}
 					
 					//if the review has not already been placed in the user_personal_review_ids array
 					//then put it in private_review_ids array
-					if (! in_array($review_id, $reviews[$category_id]['user_personal_review_ids'])) {
-					$reviews[$category_id]['user_personal_review_ids'] = [];
+					if (! in_array($review_id, $reviews[$category_id]['user_review_ids'])) {
+					$reviews[$category_id]['user_review_ids'] = [];
 					$reviews[$category_id]['private_review_ids'][]= $review_id;
 					$reviews[$category_id]['public_review_ids'] = [];
-
+					$reviews[$category_id]['user_personal_count'] = count($reviews[$category_id]['user_review_ids']);
+					$reviews[$category_id]['private_count'] = count($reviews[$category_id]['private_review_ids']);
+					$reviews[$category_id]['public_count'] = count($reviews[$category_id]['public_review_ids']);
 					}
-					
 				}
 
 				// Iterate through public review results and append to combined reviews
@@ -115,9 +123,12 @@ require('dbConnect.php');
 
 					//if nothing has been set for user_personal_review_ids
 					//then set it to be an empty array
-					if (! isset($reviews[$category_id]['user_personal_review_ids'])) {
-					$reviews[$category_id]['user_personal_review_ids'] = [];
-					$reviews[$category_id]['user_personal_count'] = count($reviews[$category_id]['private_review_ids']);
+					if (! isset($reviews[$category_id]['user_review_ids'])) {
+					$reviews[$category_id]['user_review_ids'] = [];
+					$reviews[$category_id]['user_personal_count'] = count($reviews[$category_id]['user_review_ids']);
+					$reviews[$category_id]['private_count'] = count($reviews[$category_id]['private_review_ids']);
+					$reviews[$category_id]['public_count'] = count($reviews[$category_id]['public_review_ids']);
+					
 					}
 						
 					//if nothing has been set for private_review_ids
@@ -125,15 +136,22 @@ require('dbConnect.php');
 					if (! isset($reviews[$category_id]['private_review_ids'])) {
 					$reviews[$category_id]['private_review_ids'] = [];
 					$reviews[$category_id]['private_count'] = count($reviews[$category_id]['private_review_ids']);
+					$reviews[$category_id]['user_personal_count'] = count($reviews[$category_id]['user_review_ids']);
+				    $reviews[$category_id]['private_count'] = count($reviews[$category_id]['private_review_ids']);
+					$reviews[$category_id]['public_count'] = count($reviews[$category_id]['public_review_ids']);
+					
 					}
 
 					//if the review has not already been placed in the private_review_ids array
 					//then put it in public_review_ids array
 					if ( ! in_array($review_id, $reviews[$category_id]['private_review_ids'])) {	
-						//$reviews[$category_id]['user_personal_review_ids'] = [];
+						//$reviews[$category_id]['user_review_ids'] = [];
 					//$reviews[$category_id]['private_review_ids'] = [];
 					$reviews[$category_id]['public_review_ids'][] = $review_id;
-					$reviews[$category_id]['public_count'] = count($reviews[$category_id]['private_review_ids']);
+					$reviews[$category_id]['user_personal_count'] = count($reviews[$category_id]['user_review_ids']);
+					$reviews[$category_id]['private_count'] = count($reviews[$category_id]['private_review_ids']);
+					$reviews[$category_id]['public_count'] = count($reviews[$category_id]['public_review_ids']);
+					
 					}
 
 				}

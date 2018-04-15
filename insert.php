@@ -7,7 +7,7 @@ require('dbConnect.php');
 
 $user_id = $_POST['jsonarray'];
 //$contact_id = 37;
-$id_list = array(1,2,7);
+$id_list = array(1,3,7);
 $id_list2 = implode(',', $id_list);
 
                 
