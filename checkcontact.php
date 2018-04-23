@@ -93,11 +93,15 @@ $array = json_decode($json);
 			//who may have been added or deleted into user's contacts phone book since the last time using the app
 				
 				$query3 = "SELECT * FROM contacts WHERE user_id = ? AND contact_id = ?";
-				$stmt3 = $con->prepare($query3) or die(mysqli_error($con));
+				if ($stmt3 = $con->prepare($query3) or die(mysqli_error($con))) {
 				$stmt3->bind_param('ii', $user_id, $contact_id) or die ("MySQLi-stmt binding failed ".$stmt3->error);
 				$stmt3->execute() or die ("MySQLi-stmt execute failed ".$stmt3->error);
 			    $result3 = $stmt3->get_result();
-			
+			    $stmt3->close();
+
+				}
+				
+				
 			   //if the contact is not already in the contacts table...
 			   //if the $contact_id is not present with the $user_id value, then put him in the contacts table
 			    If ($result3->num_rows == 0) {
@@ -143,7 +147,6 @@ $array = json_decode($json);
 		   
 $stmt->close();
 $stmt2->close();
-$stmt3->close();
 
 
 		?>

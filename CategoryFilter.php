@@ -2,8 +2,8 @@
 require('dbConnect.php');
 
 			//this is me, my username in the user table
-			$Number = $_POST['phonenumberofuser'];
-			//$Number = "+353872934480";
+			//$Number = $_POST['phonenumberofuser'];
+			$Number = "+353872934480";
 			//$Number = "+353864677745";
 
 			// The ? below are parameter markers used for variable binding
@@ -66,6 +66,8 @@ require('dbConnect.php');
 			// Prepare combined reviews array
 			$reviews = [];
 			
+			//echo "user_review_ids values :";
+			
 				//Iterate through user personal review results and append to combined reviews
 				while (($row = $userPersonalReviews->fetch_assoc())) {
 				
@@ -73,7 +75,7 @@ require('dbConnect.php');
 				$category_id = $row['cat_name'];
 				
 				//whatever review ids satisfy the $userPersonalReviews->fetch_assoc
-				//condition  then put then review_id in user_personal_review_ids array
+				//condition  then put the review_id in user_personal_review_ids array
 				$reviews[$category_id]['cat_name'] = $category_id;
 				$reviews[$category_id]['user_review_ids'][] = $review_id;
 				$reviews[$category_id]['private_review_ids'] = [];
@@ -82,9 +84,12 @@ require('dbConnect.php');
 				$reviews[$category_id]['private_count'] = count($reviews[$category_id]['private_review_ids']);
 				$reviews[$category_id]['public_count'] = count($reviews[$category_id]['public_review_ids']);
 
+				//echo json_encode($reviews[$category_id]['user_review_ids']);
 
 				}
-			
+				
+				//echo "<br> private_review_ids values :";
+
 			    //Iterate through private review results and append to combined reviews
 				while (($row = $privateReviews->fetch_assoc())) {
 				$category_id = $row['cat_name'];
@@ -108,13 +113,15 @@ require('dbConnect.php');
 					//if the review has not already been placed in the user_personal_review_ids array
 					//then put it in private_review_ids array
 					if (! in_array($review_id, $reviews[$category_id]['user_review_ids'])) {
-					$reviews[$category_id]['user_review_ids'] = [];
+					//$reviews[$category_id]['user_review_ids'] = [];
 					$reviews[$category_id]['private_review_ids'][]= $review_id;
 					$reviews[$category_id]['public_review_ids'] = [];
 					$reviews[$category_id]['user_personal_count'] = count($reviews[$category_id]['user_review_ids']);
 					$reviews[$category_id]['private_count'] = count($reviews[$category_id]['private_review_ids']);
 					$reviews[$category_id]['public_count'] = count($reviews[$category_id]['public_review_ids']);
 					}
+					
+					//echo json_encode($reviews[$category_id]['private_review_ids']);
 				}
 
 				// Iterate through public review results and append to combined reviews
@@ -160,6 +167,7 @@ require('dbConnect.php');
 				}
 				
             //make $reviews into a JSON Array
+			//echo "<br>";
 			echo json_encode(array_values($reviews)); 
 
 ?>
