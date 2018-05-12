@@ -21,6 +21,7 @@ $Number = $_POST['phonenumberofuser'];
 			//this is the matching user_id in the user table of the user
             //echo $row['user_id']."<br />";
 			$user_id = $row["user_id"];
+			//$username = $row["username"];
 			//echo $user_id;
 			}
 			
@@ -44,6 +45,7 @@ $results = array();
 	while($row = mysqli_fetch_array($result2)) {
 		//make an array called $results
 				 $results[] = array(
+		 'publicorprivate' => $row['public_or_private'], 	 
 		 'category' => $row['cat_name'], 
 		 'name' => $row['name'],
 		 'phone' => $row['phone'],

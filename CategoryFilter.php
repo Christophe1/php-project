@@ -2,8 +2,8 @@
 require('dbConnect.php');
 
 			//this is me, my username in the user table
-			//$Number = $_POST['phonenumberofuser'];
-			$Number = "+353872934480";
+			$Number = $_POST['phonenumberofuser'];
+			//$Number = "+353872934480";
 			//$Number = "+353864677745";
 
 			// The ? below are parameter markers used for variable binding

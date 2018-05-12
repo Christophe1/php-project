@@ -29,7 +29,9 @@
 	$results3 = array();
 	
 		foreach($UserReviewID as $UserReviewID) {
-        $sql2 = "SELECT * FROM review WHERE review_id = ?";
+			
+		//join review table with the user table
+        $sql2 = "SELECT * FROM review INNER JOIN user ON review.user_id = user.user_id WHERE review_id = ?";
         $stmt2 = $con->prepare($sql2) or die(mysqli_error($con));
         $stmt2->bind_param('i', $UserReviewID) or die ("MySQLi-stmt binding failed ".$stmt2->error);
         $stmt2->execute() or die ("MySQLi-stmt execute failed ".$stmt2->error);
@@ -37,17 +39,23 @@
         
         while($row = mysqli_fetch_array($result2)) {//make an array called $results
             $results[] = array(
+				'publicorprivate' => $row['public_or_private'], 
                 'category' => $row['cat_name'],
                 'name' => $row['name'],
                 'phone' => $row['phone'],
                 'comment' => $row['comment'],
                 'reviewid' => $row['review_id'],
+				'username' => $row['username'],
             );
+						
         }
+		
+		
+		
     }
-	
+		//for each review_id of a matching category belonging to a phone contact of the logged-in user
 	    foreach($PrivateReviewID as $PrivateReviewID) {
-        $sql2 = "SELECT * FROM review WHERE review_id = ?";
+        $sql2 = "SELECT * FROM review INNER JOIN user ON review.user_id = user.user_id WHERE review_id = ?";
         $stmt2 = $con->prepare($sql2) or die(mysqli_error($con));
         $stmt2->bind_param('i', $PrivateReviewID) or die ("MySQLi-stmt binding failed ".$stmt2->error);
         $stmt2->execute() or die ("MySQLi-stmt execute failed ".$stmt2->error);
@@ -55,17 +63,19 @@
         
         while($row = mysqli_fetch_array($result2)) {//make an array called $results2
             $results2[] = array(
+				'publicorprivate' => $row['public_or_private'], 
                 'category' => $row['cat_name'],
                 'name' => $row['name'],
                 'phone' => $row['phone'],
                 'comment' => $row['comment'],
                 'reviewid' => $row['review_id'],
+				'username' => $row['username'],
             );
         }
     }
-	
+		//for each review_id of a matching category belonging to the general public
 		foreach($PublicReviewID as $PublicReviewID) {
-        $sql2 = "SELECT * FROM review WHERE review_id = ?";
+        $sql2 = "SELECT * FROM review INNER JOIN user ON review.user_id = user.user_id WHERE review_id = ?";
         $stmt2 = $con->prepare($sql2) or die(mysqli_error($con));
         $stmt2->bind_param('i', $PublicReviewID) or die ("MySQLi-stmt binding failed ".$stmt2->error);
         $stmt2->execute() or die ("MySQLi-stmt execute failed ".$stmt2->error);
@@ -73,11 +83,13 @@
         
         while($row = mysqli_fetch_array($result3)) {//make an array called $results3
             $results3[] = array(
+				'publicorprivate' => $row['public_or_private'], 
                 'category' => $row['cat_name'],
                 'name' => $row['name'],
                 'phone' => $row['phone'],
                 'comment' => $row['comment'],
                 'reviewid' => $row['review_id'],
+				'username' => $row['username'],
             );
         }
     }
