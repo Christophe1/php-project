@@ -4,7 +4,8 @@
 require('dbConnect.php');
 
 //this is the review_id of the ViewContact class, received from the PopulistoListView class
-/$name = $_REQUEST['name'];
+$Number = $_POST['phonenumberofuser'];
+//$name = $_REQUEST['name'];
 //$name = $_POST['name'];
 //$name = "to";
 //$name = $string . '%%';
@@ -23,18 +24,30 @@ require('dbConnect.php');
 			    //$result = $stmt->get_result();
 				
 				//$sql = "SELECT cat_id, cat_name FROM category WHERE cat_name like like '$name%%'";
-				$sql = "SELECT cat_id, cat_name FROM category WHERE cat_name like '%".$name."%'";
+				//$sql = "SELECT cat_id, cat_name FROM category WHERE cat_name like '%".$name."%'";
+				$sql = "SELECT cat_id, cat_name FROM category";
+
 
 				$result = mysqli_query($con,$sql);
 
 				$rows = array();
 				
-				while($row = mysqli_fetch_assoc($result)) {
+				while($row = mysqli_fetch_array($result)) {
 					
+					//$id = $row['cat_id'];
+                  //$name = $row['cat_name'];
 					
-			    $rows['results'][] = $row;
+			    $rows[] = array(
+				
+			'cat_id' => $row['cat_id'], 	 
+		    'cat_name' => $row['cat_name'], 
+				
+				);
+					
 					
 				}
+				
+
 				
 
 /* $data = '{"results":[{"id":"1","name":"ab"},{"id":"2","name":"abc"},{"id":"3","name":"bc"},{"id":"4","name":"bcd"},{"id":"5","name":"cd"},{"id":"6","name":"cde"},{"id":"7","name":"ef"},{"id":"8","name":"efg"},{"id":"9","name":"hi"},{"id":"10","name":"hig"},{"id":"11","name":"jk"},{"id":"12","name":"jkl"},{"id":"13","name":"mn"},{"id":"14","name":"mno"},{"id":"15","name":"pq"},{"id":"16","name":"pqr"},{"id":"17","name":"st"},{"id":"18","name":"stu"},{"id":"19","name":"vw"},{"id":"20","name":"vwx"},{"id":"21","name":"yz"},{"id":"22","name":"yza"}]}'; */
