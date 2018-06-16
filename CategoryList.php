@@ -10,8 +10,8 @@
 	//post the phone number of the user, which in the user table is username, and get associated user_id
 
 	//received from app, the phonenumber, which in the DB is username
-	//$Number = $_POST['phonenumberofuser'];
-	$Number = "+353872934480";
+	$Number = $_POST['phonenumberofuser'];
+	//$Number = "+353872934480";
 
 				//now we need to get the matching user_id
 				// check the username in the user table and get the matching user_id
@@ -57,19 +57,6 @@
 				}  
 				
 				
-				//echo "all Christophe's 0 and 1s: " . json_encode($array1);
-				echo "<br>";
-				echo "<br>";
-				//echo "all publics: " . json_encode($array2);
-				echo "<br>";
-				echo "<br>";
-				//append the values onto the end of the previous array
-				//$array1AndArray2 = array_merge_recursive($array1, $array2);
-				
-				//echo json_encode($array1AndArray2);
-				echo "<br>";
-				echo "<br>";
-				
 				//NOW, we want to see IF OWN-USER IS INCLUDED IN SHARED REVIEWS by peope own-user knows
 				//PUBLIC_OR_PRIVATE = 1 FOR NOT OWN-USER REVIEWS
 				$query4 = "SELECT DISTINCT review.cat_id,cat_name FROM review INNER JOIN review_shared ON review.review_id = review_shared.review_id
@@ -83,51 +70,22 @@
 
 				while ($row = mysqli_fetch_assoc($result4)) {
 				$array3['results'][] = $row;
-				//$user_id = $row["user_id"];
-				//$cat_name = $row["cat_name"];
-				//echo $cat_name . ",";
+
 				}
 				
-			//	echo "all shared reviews where CHristophe is included: " . json_encode($array3);
-				echo "<br>";
-				echo "<br>";
-				//$array1AndArray2AndArray3 = array_merge_recursive($array1,$array2, $array3);
-				
-				//$array1AndArray2AndArray3encoded = json_encode($array1AndArray2AndArray3);
-					
-				//echo $array1AndArray2AndArray3encoded;
-				echo "<br>";
-				echo "<br>";
-				
+
 				$array1 = json_encode($array1);
 				$array2 = json_encode($array2);
 				$array3 = json_encode($array3);
-
-
-				
-				//$uniqueArray = array_values(array_unique($array1AndArray2AndArray3, SORT_REGULAR));
-				
-				//echo "Unique array is " . json_encode($uniqueArray);
 
 				$array1 =  json_decode($array1, TRUE);
 				$array2 =  json_decode($array2, TRUE);
 				$array3 =  json_decode($array3, TRUE);
 
-				//echo "Unique array 1 is " . $array1;
 				$array4 = array_merge_recursive($array1['results'], $array2['results'], $array3['results']);
-				
-				//echo "Unique array 4 is " . json_encode($array4);
-				echo "<br>";
 
 				$uniqueArray2['results'] = array_values(array_unique($array4, SORT_REGULAR));
 				
-				echo "Unique array 2 is " . json_encode($uniqueArray2);
+				echo json_encode($uniqueArray2);
 
-				//echo "the merged one is" . json_encode(array_unique($array1AndArray2AndArray3, SORT_REGULAR));
-				
-				
-				//$array1AndArray2AndArray3Unique = array_unique($array1AndArray2AndArray3);
-				
-				//echo $array1AndArray2AndArray3Unique;
-	
 		?>

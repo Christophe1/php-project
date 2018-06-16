@@ -55,6 +55,10 @@ print_r($data);
 
 //post the phone number of the user, which in the table is username
 $Number = $_POST['phonenumberofuser'];
+//post the hash, generated in Android
+$Hash = $_POST['hashpass'];
+//post the timestamp from Android
+$TimeStamp = $_POST['timestamp'];
 
 // The ? below are parameter markers used for variable binding
 // auto increment does not need prepared statements
@@ -66,11 +70,12 @@ $Number = $_POST['phonenumberofuser'];
 				$stmt->execute() or die ("MySQLi-stmt execute failed ".$stmt->error);
 			    $result = $stmt->get_result();
 			
-			   //if the username is not already in the user table, then put him in
+			   //if the username is not already in the user table, then put it in.
 			   //the other value in the table, user_id, is auto incremented, so it is inserted automatically
+			   //also put in hashpass and timestamp
 			    If ($result->num_rows == 0) {
-				$stmt2 = $con->prepare("INSERT INTO user (username) VALUES(?)") or die(mysqli_error($con));
-				$stmt2->bind_param('s', $Number) or die ("MySQLi-stmt binding failed ".$stmt2->error);
+				$stmt2 = $con->prepare("INSERT INTO user (username,hash,timestamp) VALUES(?,?,?)") or die(mysqli_error($con));
+				$stmt2->bind_param('sss', $Number, $Hash, $TimeStamp) or die ("MySQLi-stmt binding failed ".$stmt2->error);
 				$stmt2->execute() or die ("MySQLi-stmt execute failed ".$stmt2->error); 
 				//$result2 = $stmt2->get_result(); 
 				}
