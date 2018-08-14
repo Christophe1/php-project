@@ -49,6 +49,7 @@ $results = array();
 		 'category' => $row['cat_name'], 
 		 'name' => $row['name'],
 		 'phone' => $row['phone'],
+		 'address' => $row['address'],
 		 'comment' => $row['comment'],
 		 'reviewid' => $row['review_id'],
 		 );

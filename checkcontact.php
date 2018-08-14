@@ -10,12 +10,12 @@
 //***************************************************
 require('dbConnect.php');
 
-//this is the username in the user table
+//this is the username, the logged-in user, in the user table
 $Number = $_POST['phonenumberofuser'];
 //$Number = "+353872934480";
 // get the username of the user in the user table, then get the matching user_id in the user table
 				// so we can check contacts against it 
-				$query = "SELECT * FROM user WHERE username = ?";
+				$query = "SELECT user_id FROM user WHERE username = ?";
 				$stmt = $con->prepare($query) or die(mysqli_error($con));
 				$stmt->bind_param('s', $Number) or die ("MySQLi-stmt binding failed ".$stmt->error);
 				$stmt->execute() or die ("MySQLi-stmt execute failed ".$stmt->error);
@@ -29,6 +29,7 @@ $Number = $_POST['phonenumberofuser'];
 			
 			
 //now post all contacts in my phone as a JSON array
+//It will look something like [{"phone_number":"+3538745465381","name":"Tom"},{"phone_number":"+35385...etc...
 $json = $_POST['phonenumberofcontact'];
 //decode the JSON into PHP language, will look something like ["phone_number"] => "+353871234567"
 $array = json_decode($json);

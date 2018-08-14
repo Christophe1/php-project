@@ -8,8 +8,8 @@ require('dbConnect.php');
 //**************THIS IS FOR INSERTING A PHONE NUMBER INTO USER TABLE *************************
 
 //post the hash, generated in Android
-//$Hash = $_POST['hashpass'];
-$Hash = "06fc4db34c302f8c38294f7763f22c7a";
+$Hash = $_POST['hashpass'];
+//$Hash = "06fc4db34c302f8c38294f7763f22c7a";
 
 // check to see if the hash exists in the user table
  				$query = "SELECT * FROM user WHERE hash = ?";
@@ -22,14 +22,17 @@ $Hash = "06fc4db34c302f8c38294f7763f22c7a";
 			    If ($result->num_rows > 0) {
 					
 					 echo "True";
+					 //echo $Hash;
+
 					 $stmt->close();
 
 				}
 				else {
 				//If the hash doesn't exist...
 					echo "False";
+					//echo $Hash;
 					$stmt->close();
-					return false;
+					//return false;
         }
 
 ?>

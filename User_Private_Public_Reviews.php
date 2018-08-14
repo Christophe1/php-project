@@ -20,7 +20,7 @@
 	$PublicReviewID = explode(",",$PublicReviewID); */
 
 	//for user_review_ids
-	$results = array();
+	$results1 = array();
 	
 	//for private_review_ids
 	$results2 = array();
@@ -35,13 +35,14 @@
         $stmt2 = $con->prepare($sql2) or die(mysqli_error($con));
         $stmt2->bind_param('i', $UserReviewID) or die ("MySQLi-stmt binding failed ".$stmt2->error);
         $stmt2->execute() or die ("MySQLi-stmt execute failed ".$stmt2->error);
-        $result2 = $stmt2->get_result();
+        $result1 = $stmt2->get_result();
         
-        while($row = mysqli_fetch_array($result2)) {//make an array called $results
-            $results[] = array(
+        while($row = mysqli_fetch_array($result1)) {//make an array called $results
+            $results1[] = array(
 				'publicorprivate' => $row['public_or_private'], 
                 'category' => $row['cat_name'],
                 'name' => $row['name'],
+				'address' => $row['address'],
                 'phone' => $row['phone'],
                 'comment' => $row['comment'],
                 'reviewid' => $row['review_id'],
@@ -66,6 +67,7 @@
 				'publicorprivate' => $row['public_or_private'], 
                 'category' => $row['cat_name'],
                 'name' => $row['name'],
+				'address' => $row['address'],
                 'phone' => $row['phone'],
                 'comment' => $row['comment'],
                 'reviewid' => $row['review_id'],
@@ -86,6 +88,7 @@
 				'publicorprivate' => $row['public_or_private'], 
                 'category' => $row['cat_name'],
                 'name' => $row['name'],
+				'address' => $row['address'],
                 'phone' => $row['phone'],
                 'comment' => $row['comment'],
                 'reviewid' => $row['review_id'],
@@ -94,6 +97,6 @@
         }
     }
 
-    $combinedResults = array('user_review_ids' => $results, 'private_review_ids' => $results2, 'public_review_ids' => $results3);
+    $combinedResults = array('user_review_ids' => $results1, 'private_review_ids' => $results2, 'public_review_ids' => $results3);
     echo json_encode($combinedResults);
 ?>
