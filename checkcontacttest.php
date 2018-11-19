@@ -11,7 +11,14 @@
 require('dbConnect.php');
 
 //this is the username, the logged-in user, in the user table
-$Number = $_POST['phonenumberofuser'];
+//$Number = $_POST['phonenumberofuser'];
+$Number = "+353873525613";
+//$Number2 = "10227";
+//$Number3 = "666";
+
+			//$review_id = "";
+			//$cat_id  = "";
+
 //$Number = "+353872934480";
 // get the username of the user in the user table, then get the matching user_id in the user table
 				// so we can check contacts against it 
@@ -26,11 +33,18 @@ $Number = $_POST['phonenumberofuser'];
 			//this is the user_id in the user table of the user
 			$user_id = $row["user_id"];
 			}
+			echo "user_id is: " . $user_id . "<br>";
 			
 			
 //now post all contacts in my phone as a JSON array
 //It will look something like [{"phone_number":"+3538745465381","name":"Tom"},{"phone_number":"+35385...etc...
-$json = $_POST['phonenumberofcontact'];
+
+$json = '[{"phone_number":"+3538745465381","name":"+353 87 454 65381"},{"phone_number":"+353851841344","name":"0851841344"},{"phone_number":"+34631898397","name":"Alex Kariginsky"},{"phone_number":"+33647370605","name":"Alex Nike"},{"phone_number":"+3538520987","name":"Ann Curry Darndale"},{"phone_number":"+35318558586","name":"Ann White"},{"phone_number":"+353864024923","name":"anto football"},{"phone_number":"+353906486300","name":"Axa Motor Rescue"},{"phone_number":"+353872497348","name":"Babette Harris"},{"phone_number":"+4915904455627","name":"Basak Germany"},{"phone_number":"+353857661772","name":"Bridget Courtney"},{"phone_number":"+353872930317","name":"Caitriona OKelly"},{"phone_number":"+353873606058","name":"Cheury Childminder"},{"phone_number":"+353872934480","name":"Christophe Per"},{"phone_number":"+353877649919","name":"Claire Harris Mobile"},{"phone_number":"+353874546538","name":"Claire Harris Mobile"},{"phone_number":"+61450692667","name":"Claire Mobile Oz"},{"phone_number":"+353877638356","name":"Daddy"},{"phone_number":"+353868782191","name":"Damian Football"},{"phone_number":"+353868118447","name":"Derek Peppard"},{"phone_number":"+353899407444","name":"Dmitry"},{"phone_number":"+353851111102","name":"Domo Amie"},{"phone_number":"+353874113618","name":"Donal Murray"},{"phone_number":"+353872139485","name":"Duty Manager Convergys"},{"phone_number":"+3536661234456","name":"Efpeters"},{"phone_number":"+353870617063","name":"Elise Nike"},{"phone_number":"+353862479142","name":"Eoin Quinn"},{"phone_number":"+353852239501","name":"Esther"},{"phone_number":"+61478914157","name":"Ewan"},{"phone_number":"+491739475188","name":"Florian Iconik"},{"phone_number":"+353879759716","name":"Fr Hannon"},{"phone_number":"+353863762628","name":"France Carr"},{"phone_number":"+353874176481","name":"Ger (And Der)"},{"phone_number":"+3535454","name":"Guff"},{"phone_number":"+353831371462","name":"Helen Mcdonald"},{"phone_number":"+35314970234","name":"Hilary Moloney"},{"phone_number":"+353866021869","name":"Ian Elliott"},{"phone_number":"+353872988755","name":"Inigo Viti"},{"phone_number":"+353868647715","name":"Irene"},{"phone_number":"+353864677745","name":"Jen Mob"},{"phone_number":"+35318394089","name":"Jen Mob"},{"phone_number":"+353872737","name":"Jen Visa Debit Card Pin"},{"phone_number":"+353872345465","name":"Jim Beam"},{"phone_number":"+353852155149","name":"Joan Mccann"},{"phone_number":"+353858716422","name":"John Collins"},{"phone_number":"+353867749714","name":"John Flashman"},{"phone_number":"+353851478849","name":"John kershaw"},{"phone_number":"+61418105717","name":"Justin"},{"phone_number":"+353874372987","name":"Justin"},{"phone_number":"+353857813277","name":"Karen Bunratty"},{"phone_number":"+353858377914","name":"Karen Cullen"},{"phone_number":"+353877529563","name":"Karl football"},{"phone_number":"+353852136355","name":"Keith Mcenaspy"},{"phone_number":"+353863366715","name":"Lala Nathalie"},{"phone_number":"+33466809489","name":"Le Grau Du Roi"},{"phone_number":"+353509758351","name":"Le Grau Test"},{"phone_number":"+353857435122","name":"Lennart Sobieka"},{"phone_number":"+35318295806","name":"lisa bassett cpl"},{"phone_number":"+353871390535","name":"Lisa Quinn"},{"phone_number":"+353872753024","name":"Lorcan"},{"phone_number":"+353872393473","name":"Louis Mobile"},{"phone_number":"+353861265483","name":"Louise Durkin"},{"phone_number":"+48697557153","name":"Lucaz Iconik"},{"phone_number":"+353851842697","name":"Mandy Brennan"},{"phone_number":"+353871272698","name":"Marcin Dettlaf"},{"phone_number":"+353858668490","name":"Mark Kelly"},{"phone_number":"+353872867692","name":"Mark O Donoghue"},{"phone_number":"+353858618711","name":"Martin O Connor"},{"phone_number":"+35318425315","name":"Mary And Patricia Nolan"},{"phone_number":"+353872434871","name":"Mary Reville"},{"phone_number":"+353872304207","name":"Michael Byrne"},{"phone_number":"+353872306559","name":"Michael Caulfield"}]';
+
+
+//$json = '[{"phone_number":"12345","name":"Bob"},{"phone_number":"67890","name":"Sally"},{"phone_number":"11223344","name":"Jim"},{"phone_number":"987654","name":"Marge"}]';
+
+//$json = $_POST['phonenumberofcontact'];
 //decode the JSON into PHP language, will look something like ["phone_number"] => "+353871234567"
 $array = json_decode($json);
 
@@ -100,13 +114,12 @@ $array = json_decode($json);
 			    $result3 = $stmt3->get_result();
 			    $stmt3->close();
 
+				echo "contact_id is: " . $contact_id . "," . "<br>";
 				}
 				
-			//Make sure public reviews of contacts are visible to the logged-in user.
-			//(We need to do this because, if logged-in user is in mobile phone as a contact, and logged-in user
-			//has downloaded the app after contact has made the review 'public', they will not be checked for that review )
-			//CHECK REVIEW TABLE FOR reviews made by contacts of the logged-in user, get the
-			//public (public_or_private = 2) ones
+				//Make sure public reviews of contacts are visible to the logged-in user.
+				//CHECK REVIEW TABLE FOR reviews made by contacts of the logged-in user, get the
+				//public (public_or_private = 2) ones
 				$query6 = "SELECT * FROM review WHERE public_or_private = 2 AND user_id = ?";
 				$stmt6 = $con->prepare($query6) or die(mysqli_error($con));
 				$stmt6->bind_param('i', $contact_id) or die ("MySQLi-stmt binding failedd ".$stmt6->error);
@@ -114,7 +127,6 @@ $array = json_decode($json);
 			    $result6 = $stmt6->get_result();
 			    $stmt6->close();
 				
-				//while we have all public reviews by contacts of the logged-in user...
 				while ($row = $result6->fetch_assoc()) {
 					
 					//get the associated review_id column value
@@ -122,19 +134,35 @@ $array = json_decode($json);
 					
 					//get the associated cat_id column value
 					$cat_id = $row['cat_id'];
+					echo "review id is " . $review_id . "and cat_id is " . $cat_id . "<br>";
 				
-			//For reviews of contacts of logged-in user that are public in review table, check if 
-			//logged-in user is a contact, in the review_shared table
+				//For reviews of contacts of logged-in user that are public in review table, check if 
+				//logged-in user is a contact, in the review_shared table
 				$query8 = "SELECT * FROM review_shared WHERE review_id = ? AND user_id = ? AND contact_id = ?";
 				$stmt8 = $con->prepare($query8) or die(mysqli_error($con));
 				$stmt8->bind_param('iii', $review_id, $contact_id, $user_id) or die ("MySQLi-stmt binding failed ".$stmt8->error);
 				$stmt8->execute() or die ("MySQLi-stmt execute failed ".$stmt8->error);
 			    $result8 = $stmt8->get_result();
 			    $stmt8->close();
-
 				
-				If ($result8->num_rows == 0) {
-									
+				//while ($row = $result8->fetch_assoc()) {
+					
+					//get the associated cat_id column value
+					//$cat_id = $row['cat_id'];
+					//echo $cat_id . ",";
+				//}
+				
+								If ($result8->num_rows == 0) {
+					
+				echo "True dude" . "<br>";
+				echo "Problem cat_id" . $cat_id . "<br>";
+				echo "Problem review_id" . $review_id . "<br>";
+				echo "Problem contact_id" . $contact_id . "<br>";
+				echo "Problem user_id" . $user_id . "<br>";
+				echo "Problem Number" . $Number . "<br>";
+				
+				//echo "review id is " . $review_id . "and cat_id is " . $cat_id . "<br>";
+				
 				//If the logged-in user is not already in the contact_id column of the review_shared table, for that particluar review_id, then put him in...
    	 			$stmt9 = $con->prepare("INSERT INTO review_shared (cat_id, review_id, user_id, contact_id, username) VALUES(?,?,?,?,?)") or die(mysqli_error($con));
 				$stmt9->bind_param('iiiis', $cat_id, $review_id, $contact_id, $user_id, $Number) or die ("MySQLi-stmt binding failed ".$stmt9->error);
@@ -146,6 +174,12 @@ $array = json_decode($json);
 				}
 				
 				
+
+				
+				
+				
+
+			//}
 			   //if the contact is not already in the contacts table...
 			   //if the $contact_id is not present with the $user_id value, then put him in the contacts table
 			    If ($result3->num_rows == 0) {
@@ -155,15 +189,7 @@ $array = json_decode($json);
 				$stmt4->close();
 				}
 					
-				//HERE: CHECK REVIEW_SHARED TABLE FOR ALL PUBLICLY SHARED
-				//REVIEWS (2) BY $contact_id. IF $user_id IS NOT IN THE contact_id COLUMN, 
-				//PUT HIM IN 
-/* 				If ($result6->num_rows == 0) {
-				$stmt7 = $con->prepare("INSERT INTO review_shared (user_id, contact_id) VALUES(?,?)") or die(mysqli_error($con));
-				$stmt7->bind_param('ii', $contact_id, $user_id) or die ("MySQLi-stmt binding failed ".$stmt7->error);
-				$stmt7->execute() or die ("MySQLi-stmt execute failed ".$stmt7->error);
-				$stmt7->close();
-				} */
+
 				
                 
 				//If a contact has been deleted from my phonebook and this contact is a user of the app:
@@ -171,7 +197,7 @@ $array = json_decode($json);
 				// from my phone (results[] is matching contacts, those on my phone and users of the app) then delete 
 				//those phone numbers/ records from the contacts table.
 				
-				//encode the contacts in the contacts table of this user
+				//encode the contact ids in the contacts table of this user
 				$json4 = json_encode($contact_id_results);
 				//decode $json4, because our implode wasn't working otherwise
                 $json5 = json_decode($json4);				
@@ -184,10 +210,20 @@ $array = json_decode($json);
 				$stmt5 = $con->prepare($query5) or die(mysqli_error($con));
 				$stmt5->bind_param('i', $user_id) or die ("MySQLi-stmt binding failed ".$stmt5->error);
 				$stmt5->execute() or die ("MySQLi-stmt execute failed ".$stmt5->error);
-				$stmt5->close();  
+				$stmt5->close();
+
+				//delete any unnecessary shared reviews in the review_shared table,
+				//if a contact uninstalls the app
+/*                 $query10 = "DELETE FROM review_shared WHERE contact_id = ? AND user_id NOT IN ($id_list)";
+				$stmt10 = $con->prepare($query10) or die(mysqli_error($con));
+				$stmt10->bind_param('i', $user_id) or die ("MySQLi-stmt binding failed ".$stmt10->error);
+				$stmt10->execute() or die ("MySQLi-stmt execute failed ".$stmt10->error);
+				$stmt10->close();  */				
 					
 				}
 			}
+			
+
 		 
 		 //output the matching numbers as a JSON array
 	 			 	$json2 = json_encode($results);	
@@ -197,7 +233,26 @@ $array = json_decode($json);
 					
 					//print_r($contact_id_results);
 					//echo $id_list . " " . $user_id;
-           echo $json2;   
+           echo $json2;  
+
+			  //  If ($result6->num_rows > 0) {
+					
+					 //echo $contact_id2;
+					 //echo $Hash;
+
+					 //$stmt->close();
+
+				//}
+				//else {
+				//If the hash doesn't exist...
+					//echo "False";
+					//echo $Hash;
+					//$stmt->close();
+					//return false;
+        //}
+
+		   
+		 //  echo $result3; 
 		   
 $stmt->close();
 $stmt2->close();

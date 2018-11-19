@@ -45,7 +45,8 @@ $results = array();
 	while($row = mysqli_fetch_array($result2)) {
 		//make an array called $results
 				 $results[] = array(
-		 'publicorprivate' => $row['public_or_private'], 	 
+		 'publicorprivate' => $row['public_or_private'], 
+		 'date_created' => $row['time_stamp'],
 		 'category' => $row['cat_name'], 
 		 'name' => $row['name'],
 		 'phone' => $row['phone'],

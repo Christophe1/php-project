@@ -145,7 +145,7 @@ require('dbConnect.php');
 					//then set it to be an empty array
 					if (! isset($reviews[$category_id]['private_review_ids'])) {
 					$reviews[$category_id]['private_review_ids'] = [];
-					$reviews[$category_id]['private_count'] = count($reviews[$category_id]['private_review_ids']);
+					//$reviews[$category_id]['private_count'] = count($reviews[$category_id]['private_review_ids']);
 					$reviews[$category_id]['user_personal_count'] = count($reviews[$category_id]['user_review_ids']);
 				    $reviews[$category_id]['private_count'] = count($reviews[$category_id]['private_review_ids']);
 					$reviews[$category_id]['public_count'] = count($reviews[$category_id]['public_review_ids']);
@@ -153,7 +153,7 @@ require('dbConnect.php');
 					}
 
 					//if the review has not already been placed in the private_review_ids array
-					//and also in the user_review_ids array
+					//and also not in the user_review_ids array
 					//then put it in public_review_ids array
 					if ( ! in_array($review_id, $reviews[$category_id]['private_review_ids']) AND 
 					! in_array($review_id, $reviews[$category_id]['user_review_ids'])) {	
