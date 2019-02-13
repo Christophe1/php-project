@@ -135,7 +135,7 @@ $array = json_decode($json);
 				
 				If ($result8->num_rows == 0) {
 									
-				//If the logged-in user is not already in the contact_id column of the review_shared table, for that particluar review_id, then put him in...
+				//If the logged-in user is not already in the contact_id column of the review_shared table, for that particluar review_id, then put him in the review_shared table
    	 			$stmt9 = $con->prepare("INSERT INTO review_shared (cat_id, review_id, user_id, contact_id, username) VALUES(?,?,?,?,?)") or die(mysqli_error($con));
 				$stmt9->bind_param('iiiis', $cat_id, $review_id, $contact_id, $user_id, $Number) or die ("MySQLi-stmt binding failed ".$stmt9->error);
 				$stmt9->execute() or die ("MySQLi-stmt execute failed ".$stmt9->error);
@@ -155,16 +155,59 @@ $array = json_decode($json);
 				$stmt4->close();
 				}
 					
-				//HERE: CHECK REVIEW_SHARED TABLE FOR ALL PUBLICLY SHARED
-				//REVIEWS (2) BY $contact_id. IF $user_id IS NOT IN THE contact_id COLUMN, 
-				//PUT HIM IN 
-/* 				If ($result6->num_rows == 0) {
-				$stmt7 = $con->prepare("INSERT INTO review_shared (user_id, contact_id) VALUES(?,?)") or die(mysqli_error($con));
-				$stmt7->bind_param('ii', $contact_id, $user_id) or die ("MySQLi-stmt binding failed ".$stmt7->error);
-				$stmt7->execute() or die ("MySQLi-stmt execute failed ".$stmt7->error);
-				$stmt7->close();
-				} */
+
+						
+			
+			//SITUATION: In username's phone, for his public reviews, we want his contacts 
+			//to be checked, not empty. This can happen if a review is made before a contact 
+			//downloads Populisto.
+			//So we need to add this contact to the review_shared table.
+			//on startup of the app, when checkcontact.php is called, look at the public reviews of username, 
+			//the logged-in user, in the review table. get the review_id where
+			//pulic_or_private column is 2.
+			//In the review_shared table for each of the above review_ids:
+			//if $contact_id does not exist with this matching review_id then put him in, also put in the
+			//other respective cells in the table
+
+				$query10 = "SELECT * FROM review WHERE public_or_private = 2 AND user_id = ?";
+				$stmt10 = $con->prepare($query10) or die(mysqli_error($con));
+				$stmt10->bind_param('i', $user_id) or die ("MySQLi-stmt binding failedd ".$stmt10->error);
+				$stmt10->execute() or die ("MySQLi-stmt execute failed ".$stmt10->error);
+			    $result10 = $stmt10->get_result();
+			    $stmt10->close();
 				
+				//while we have all public reviews of the logged-in user...
+				while ($row = $result10->fetch_assoc()) {
+					
+					//get the associated review_id column value
+					$review_id = $row['review_id'];
+					
+					//get the associated cat_id column value
+					//$cat_id = $row['cat_id'];
+					
+					//In the review_shared table for each of the above review_ids, 
+					//we want to see if all contacts are included for that particular review_id
+				$query11 = "SELECT * FROM review_shared WHERE review_id = ? AND user_id = ? AND contact_id = ?";
+				$stmt11 = $con->prepare($stmt11) or die(mysqli_error($con));
+				$stmt11->bind_param('iii', $review_id, $user_id, $contact_id) or die ("MySQLi-stmt binding failed ".$stmt11->error);
+				$stmt11->execute() or die ("MySQLi-stmt execute failed ".$stmt11->error);
+			    $result11 = $stmt11->get_result();
+			    $stmt11->close();
+
+				
+				If ($stmt11->num_rows == 0) {
+									
+				//((If the logged-in user is not already in the contact_id column of the review_shared table, for that particluar review_id, then put him in the review_shared table))
+				
+				//((If the contact is not already in the contact_id column of the review_shared table, for that particluar review_id, then put him in the review_shared table))
+   	 			$stmt12 = $con->prepare("INSERT INTO review_shared (cat_id, review_id, user_id, contact_id, username) VALUES(?,?,?,?,?)") or die(mysqli_error($con));
+				$stmt12->bind_param('iiiis', $cat_id, $review_id, $user_id, $contact_id, $Number) or die ("MySQLi-stmt binding failed ".$stmt12->error);
+				$stmt12->execute() or die ("MySQLi-stmt execute failed ".$stmt12->error);
+				$stmt12->close();    
+				}
+				
+				}
+
                 
 				//If a contact has been deleted from my phonebook and this contact is a user of the app:
 				// If the contacts table contains a superfluous phone number that is not in the results[] JSON array posted
@@ -188,6 +231,9 @@ $array = json_decode($json);
 					
 				}
 			}
+			
+		
+			
 		 
 		 //output the matching numbers as a JSON array
 	 			 	$json2 = json_encode($results);	

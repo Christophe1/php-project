@@ -229,7 +229,7 @@ require('dbConnect.php');
 							//we need the user_id, which is $user_id
 							//we need the contact_id, which is $user_id
 					
-							//post the json array of checked contacts, checkedContacts, from NewContact in my phone to this php page. 
+							//post the json array of checked contacts, checkedContacts, from EditContact in my phone to this php page. 
 							//Let's call the php-side json array $jsoncheckedContacts
 							//$_POST['checkedContacts'] is Android side, of the form [{"checkedContact":"+3531234567"},{"checkedContact":"+353868132813"}]
 							$jsoncheckedContacts = $_POST['checkedContacts'];

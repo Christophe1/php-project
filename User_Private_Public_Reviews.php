@@ -40,6 +40,7 @@
         while($row = mysqli_fetch_array($result1)) {//make an array called $results
             $results1[] = array(
 				'publicorprivate' => $row['public_or_private'], 
+				'date_created' => $row['time_stamp'],
                 'category' => $row['cat_name'],
                 'name' => $row['name'],
 				'address' => $row['address'],
@@ -64,7 +65,8 @@
         
         while($row = mysqli_fetch_array($result2)) {//make an array called $results2
             $results2[] = array(
-				'publicorprivate' => $row['public_or_private'], 
+				'publicorprivate' => $row['public_or_private'],
+				'date_created' => $row['time_stamp'],				
                 'category' => $row['cat_name'],
                 'name' => $row['name'],
 				'address' => $row['address'],
@@ -86,6 +88,7 @@
         while($row = mysqli_fetch_array($result3)) {//make an array called $results3
             $results3[] = array(
 				'publicorprivate' => $row['public_or_private'], 
+				'date_created' => $row['time_stamp'],
                 'category' => $row['cat_name'],
                 'name' => $row['name'],
 				'address' => $row['address'],
