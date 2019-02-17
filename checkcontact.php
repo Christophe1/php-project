@@ -25,6 +25,7 @@ $Number = $_POST['phonenumberofuser'];
 			while ($row = $result->fetch_assoc()) {
 			//this is the user_id in the user table of the user
 			$user_id = $row["user_id"];
+			//echo "hello hello hello";
 			}
 			
 			
@@ -75,8 +76,9 @@ $array = json_decode($json);
 			//call this user_id contact_id
 			//we will be using this for the contacts table, below
 			$contact_id = $row['user_id'];
-			
-			//foreach ($array as $value)... for each person in the phone contacts, if they are also present in the username column
+			//echo $contact_id;
+						
+						//foreach ($array as $value)... for each person in the phone contacts, if they are also present in the username column
 			if(!empty($row['username'])) {
 			
 			 //here we get the contact_id in the contacts table of matching contacts
@@ -84,7 +86,6 @@ $array = json_decode($json);
 			 //below we will delete these from the contacts table, if they don't exist in the most updated 
 			 //matching contacts.
 			 $contact_id_results[] = array('contact_id' => $contact_id);
-
 			 //$results of the matching contacts will be of the form [{"phone_number":"+123456"}, etc...]
 			 $results[] = array('phone_number' => $row['username']);
 					}
@@ -99,7 +100,6 @@ $array = json_decode($json);
 				$stmt3->execute() or die ("MySQLi-stmt execute failed ".$stmt3->error);
 			    $result3 = $stmt3->get_result();
 			    $stmt3->close();
-
 				}
 				
 			//Make sure public reviews of contacts are visible to the logged-in user.
@@ -131,7 +131,6 @@ $array = json_decode($json);
 				$stmt8->execute() or die ("MySQLi-stmt execute failed ".$stmt8->error);
 			    $result8 = $stmt8->get_result();
 			    $stmt8->close();
-
 				
 				If ($result8->num_rows == 0) {
 									
@@ -154,8 +153,32 @@ $array = json_decode($json);
 				$stmt4->execute() or die ("MySQLi-stmt execute failed ".$stmt4->error);
 				$stmt4->close();
 				}
-					
+				
+				                
 
+									//If a contact has been deleted from my phonebook and this contact is a user of the app:
+				// If the contacts table contains a superfluous phone number that is not in the results[] JSON array posted
+				// from my phone (results[] is matching contacts, those on my phone and users of the app) then delete 
+				//those phone numbers/ records from the contacts table.
+				
+				//encode the contacts in the contacts table of this user
+				$json4 = json_encode($contact_id_results);
+				//decode $json4, because our implode wasn't working otherwise
+                $json5 = json_decode($json4);				
+				//get the contact_id values as individual strings and call these $id_list
+			    $id_list = implode(",", array_map(function ($val) { return (int) $val->contact_id; }, $json5));
+				//delete any extra unnecessary contacts in the contacts table for this user
+                $query5 = "DELETE FROM contacts WHERE user_id = ? AND contact_id NOT IN ($id_list)";
+				$stmt5 = $con->prepare($query5) or die(mysqli_error($con));
+				$stmt5->bind_param('i', $user_id) or die ("MySQLi-stmt binding failed ".$stmt5->error);
+				$stmt5->execute() or die ("MySQLi-stmt execute failed ".$stmt5->error);
+				$stmt5->close();  
+					
+				}
+			}
+					
+								
+						
 						
 			
 			//SITUATION: In username's phone, for his public reviews, we want his contacts 
@@ -169,6 +192,7 @@ $array = json_decode($json);
 			//if $contact_id does not exist with this matching review_id then put him in, also put in the
 			//other respective cells in the table
 
+			    //let's get all reviews of user 10269
 				$query10 = "SELECT * FROM review WHERE public_or_private = 2 AND user_id = ?";
 				$stmt10 = $con->prepare($query10) or die(mysqli_error($con));
 				$stmt10->bind_param('i', $user_id) or die ("MySQLi-stmt binding failedd ".$stmt10->error);
@@ -176,64 +200,40 @@ $array = json_decode($json);
 			    $result10 = $stmt10->get_result();
 			    $stmt10->close();
 				
-				//while we have all public reviews of the logged-in user...
+				//while we have all public reviews of the logged-in user, 10269...
 				while ($row = $result10->fetch_assoc()) {
 					
 					//get the associated review_id column value
 					$review_id = $row['review_id'];
+					$cat_id = $row['cat_id'];
+					//echo $review_id . " " . $user_id  . " " . $contact_id . " " ;
+
 					
-					//get the associated cat_id column value
-					//$cat_id = $row['cat_id'];
-					
-					//In the review_shared table for each of the above review_ids, 
-					//we want to see if all contacts are included for that particular review_id
+				//In the review_shared table for each of the above review_ids, 
+				//we want to see if all contacts are included for that particular review_id
 				$query11 = "SELECT * FROM review_shared WHERE review_id = ? AND user_id = ? AND contact_id = ?";
-				$stmt11 = $con->prepare($stmt11) or die(mysqli_error($con));
+				$stmt11 = $con->prepare($query11) or die(mysqli_error($con));
 				$stmt11->bind_param('iii', $review_id, $user_id, $contact_id) or die ("MySQLi-stmt binding failed ".$stmt11->error);
 				$stmt11->execute() or die ("MySQLi-stmt execute failed ".$stmt11->error);
 			    $result11 = $stmt11->get_result();
 			    $stmt11->close();
-
 				
-				If ($stmt11->num_rows == 0) {
+				//while ($row = $result10->fetch_assoc()) {
+									//echo $review_id . " " . $user_id  . " " . $contact_id . " " ;
+				//}
+				
+ 				If ($result11->num_rows == 0) {
 									
-				//((If the logged-in user is not already in the contact_id column of the review_shared table, for that particluar review_id, then put him in the review_shared table))
-				
-				//((If the contact is not already in the contact_id column of the review_shared table, for that particluar review_id, then put him in the review_shared table))
+				//If the contact is not already in the contact_id column of the review_shared table, for that particluar review_id, then put him in the review_shared table
    	 			$stmt12 = $con->prepare("INSERT INTO review_shared (cat_id, review_id, user_id, contact_id, username) VALUES(?,?,?,?,?)") or die(mysqli_error($con));
-				$stmt12->bind_param('iiiis', $cat_id, $review_id, $user_id, $contact_id, $Number) or die ("MySQLi-stmt binding failed ".$stmt12->error);
+				$stmt12->bind_param('iiiis', $cat_id, $review_id, $user_id, $contact_id, $phonenumberofcontact) or die ("MySQLi-stmt binding failed ".$stmt12->error);
 				$stmt12->execute() or die ("MySQLi-stmt execute failed ".$stmt12->error);
 				$stmt12->close();    
-				}
+				}  
 				
 				}
 
-                
-				//If a contact has been deleted from my phonebook and this contact is a user of the app:
-				// If the contacts table contains a superfluous phone number that is not in the results[] JSON array posted
-				// from my phone (results[] is matching contacts, those on my phone and users of the app) then delete 
-				//those phone numbers/ records from the contacts table.
-				
-				//encode the contacts in the contacts table of this user
-				$json4 = json_encode($contact_id_results);
-				//decode $json4, because our implode wasn't working otherwise
-                $json5 = json_decode($json4);				
 
-				//get the contact_id values as individual strings and call these $id_list
-			    $id_list = implode(",", array_map(function ($val) { return (int) $val->contact_id; }, $json5));
-
-				//delete any extra unnecessary contacts in the contacts table for this user
-                $query5 = "DELETE FROM contacts WHERE user_id = ? AND contact_id NOT IN ($id_list)";
-				$stmt5 = $con->prepare($query5) or die(mysqli_error($con));
-				$stmt5->bind_param('i', $user_id) or die ("MySQLi-stmt binding failed ".$stmt5->error);
-				$stmt5->execute() or die ("MySQLi-stmt execute failed ".$stmt5->error);
-				$stmt5->close();  
-					
-				}
-			}
-			
-		
-			
 		 
 		 //output the matching numbers as a JSON array
 	 			 	$json2 = json_encode($results);	
@@ -243,7 +243,8 @@ $array = json_decode($json);
 					
 					//print_r($contact_id_results);
 					//echo $id_list . " " . $user_id;
-           echo $json2;   
+           echo  $json2;   
+		   //echo $review_id;
 		   
 $stmt->close();
 $stmt2->close();
