@@ -1,5 +1,4 @@
-		
-		<?php
+<?php
 
 //we need to deal with these situations:
 
@@ -59,13 +58,11 @@ $array = json_decode($json);
 		//execute the query, see which contacts on my phone are users of the App
 		$stmt2->execute() or die ("MySQLi-stmt execute failed 2 ".$stmt2->error);
 
-		//store the result of app users from the user's phonebook (that is, the result of the above query, $stmt2) that are using the app
+		//store the result of contacts from the user's phonebook (that is, the result of the above query, $stmt2) that are using the app
 		$result2 = $stmt2->get_result(); 
 		
 		//So, above, now we have matching contacts: contacts in the phone who are also users of the app (user_names in user table). 
 
-		//*************************************
-		
 		//This while loop is to make sure the contacts table is constantly updated.
 		//check the $phonenumberofcontact in the user's phonebook/ simultaneously users of the app, against
 		//the user's contacts table. Put the matching contacts in the contacts table for that user, if they are not
@@ -80,30 +77,29 @@ $array = json_decode($json);
 						
 						
 						
-			//for every phone number/username in the user table, like +353872943370....
+						//foreach ($array as $value)... for each person in the phone contacts, if they are also present in the username column
 			if(!empty($row['username'])) {
-			 
-			 //make an array of contacts who use the app and are phone contacts of the user
-			 //get the corresponding $contact_id ($row['user_id']) in user table
-			 //the array will be of the form [{"contact_id":"1"},{"contact_id":"27"}, etc...]
+			
+			 //here we get the contact_id in the contacts table of matching contacts
+			 //will be of the form [{"contact_id":"1"},{"contact_id":"27"}, etc...]
+			 //below we will delete these from the contacts table, if they don't exist in the most updated 
+			 //matching contacts.
 			 $contact_id_results[] = array('contact_id' => $contact_id);
 			 //$results of the matching contacts will be of the form [{"phone_number":"+123456"}, etc...]
-			 //$results[] = array('phone_number' => $row['username']);
+			 $results[] = array('phone_number' => $row['username']);
 					}
 					
-			//Check if the user_id of a phone contact is in the contacts table. We use this for updating contacts who
-			//may have been added or deleted into user's contacts phone book since the last time using the app
+			//make a select statement for contacts table where user_id = $user_id and contact_id = $contact_id. Check
+			//if the number in the user's phone contacts is in the contacts table. We use this for updating contacts who
+			//who may have been added or deleted into user's contacts phone book since the last time using the app
 				
- 				$query3 = "SELECT * FROM contacts WHERE user_id = ? AND contact_id = ?";
+				$query3 = "SELECT * FROM contacts WHERE user_id = ? AND contact_id = ?";
 				if ($stmt3 = $con->prepare($query3) or die(mysqli_error($con))) {
 				$stmt3->bind_param('ii', $user_id, $contact_id) or die ("MySQLi-stmt binding failed ".$stmt3->error);
 				$stmt3->execute() or die ("MySQLi-stmt execute failed 3 ".$stmt3->error);
 			    $result3 = $stmt3->get_result();
 			    $stmt3->close();
-				} 
-				
-				
-				/* //****************************
+				}
 				
 			//Make sure public reviews of contacts are visible to the logged-in user.
 			//(We need to do this because, if logged-in user is in mobile phone as a contact, and logged-in user
@@ -147,29 +143,34 @@ $array = json_decode($json);
 				
 				}
 				
-				************************
-				
-				*/ 
-				
 				
 			   //if the contact is not already in the contacts table...
 			   //if the $contact_id is not present with the $user_id value, then put him in the contacts table
-/*  			    If ($result3->num_rows == 0) {
+			    If ($result3->num_rows == 0) {
 				$stmt4 = $con->prepare("INSERT INTO contacts (user_id, contact_id) VALUES(?,?)") or die(mysqli_error($con));
 				$stmt4->bind_param('ii', $user_id, $contact_id) or die ("MySQLi-stmt binding failed ".$stmt4->error);
 				$stmt4->execute() or die ("MySQLi-stmt execute failed 7 ".$stmt4->error);
 				$stmt4->close();
-				} 
- */
+				}
+
+				
 
 				//If a contact has been deleted from my phonebook and this contact is a user of the app:
-				// If the contacts table contains a superfluous phone number that is not in the $contact_id_results JSON array posted
-				// from my phone then delete 
+				// If the contacts table contains a superfluous phone number that is not in the results[] JSON array posted
+				// from my phone (results[] is matching contacts, those on my phone and users of the app) then delete 
 				//those phone numbers/ records from the contacts table.
 				
-
+ 				if (empty($contact_id_results)) {
+					
+				$query4a = "DELETE FROM contacts WHERE user_id = ?";
+				$stmt4a = $con->prepare($query4a) or die(mysqli_error($con));
+				$stmt4a->bind_param('i', $user_id) or die ("MySQLi-stmt binding failed ".$stmt4a->error);
+				$stmt4a->execute() or die ("MySQLi-stmt execute failed 8".$stmt4a->error);
+				$stmt4a->close(); 
+					
+} 
 				
-/* 				//encode the contacts in the contacts table of this user
+				//encode the contacts in the contacts table of this user
 				$json4 = json_encode($contact_id_results);
 				//decode $json4, because our implode wasn't working otherwise
                 $json5 = json_decode($json4);				
@@ -180,31 +181,12 @@ $array = json_decode($json);
 				$stmt5 = $con->prepare($query5) or die(mysqli_error($con));
 				$stmt5->bind_param('i', $user_id) or die ("MySQLi-stmt binding failed ".$stmt5->error);
 				$stmt5->execute() or die ("MySQLi-stmt execute failed 8".$stmt5->error);
-				$stmt5->close();  */ 
+				$stmt5->close();  
 					
 				}
-				
-
-				
 			}
 					
-					if (!($contact_id_results)) {
-					
-					echo "it's empty";
-					//echo json_encode($contact_id_results); //"contact_id_results is empty"
- 				$query4a = "DELETE FROM contacts WHERE user_id = ?";
-				$stmt4a = $con->prepare($query4a) or die(mysqli_error($con));
-				$stmt4a->bind_param('i', $user_id) or die ("MySQLi-stmt binding failed ".$stmt4a->error);
-				$stmt4a->execute() or die ("MySQLi-stmt execute failed 8".$stmt4a->error);
-				$stmt4a->close();  
-					
- 			} else {
-				
-				echo json_encode($contact_id_results);
-				
-				//echo "it exists!";
-				
-			} 				
+								
 						
 						
 			
@@ -220,7 +202,7 @@ $array = json_decode($json);
 			//other respective cells in the table
 
 			    //let's get all reviews of user 10269
-				/* $query10 = "SELECT * FROM review WHERE public_or_private = 2 AND user_id = ?";
+				$query10 = "SELECT * FROM review WHERE public_or_private = 2 AND user_id = ?";
 				$stmt10 = $con->prepare($query10) or die(mysqli_error($con));
 				$stmt10->bind_param('i', $user_id) or die ("MySQLi-stmt binding failedd ".$stmt10->error);
 				$stmt10->execute() or die ("MySQLi-stmt execute failed 9".$stmt10->error);
@@ -243,7 +225,7 @@ $array = json_decode($json);
 				$stmt11->bind_param('iii', $review_id, $user_id, $contact_id) or die ("MySQLi-stmt binding failed ".$stmt11->error);
 				$stmt11->execute() or die ("MySQLi-stmt execute failed 10".$stmt11->error);
 			    $result11 = $stmt11->get_result();
-			    $stmt11->close(); */
+			    $stmt11->close();
 				
 				//while ($row = $result10->fetch_assoc()) {
 									//echo $review_id . " " . $user_id  . " " . $contact_id . " " ;
@@ -258,21 +240,20 @@ $array = json_decode($json);
 				$stmt12->close();    
 				} */  
 				
-				//}
+				}
 
 
 		 
 		 //output the matching numbers as a JSON array
-	 			 //	$json2 = json_encode($results);	
+	 			 	$json2 = json_encode($results);	
 					
 					//$json3 = json_encode($contact_id_results);	
 					
 					
 					//print_r($contact_id_results);
 					//echo $id_list . " " . $user_id;
-          // echo  $json4;   
+           echo  $json4;   
 		   //echo $review_id;
-		    //echo  "hi"; 
 		   
 $stmt->close();
 $stmt2->close();
@@ -280,11 +261,6 @@ $stmt2->close();
 
 		?>
 
-		
-
-
-		
-	
 		
 
 
