@@ -139,6 +139,7 @@ require('dbConnect.php');
 					$reviews[$category_id]['private_count'] = count($reviews[$category_id]['private_review_ids']);
 					$reviews[$category_id]['public_count'] = count($reviews[$category_id]['public_review_ids']);
 					
+					
 					}
 						
 					//if nothing has been set for private_review_ids
@@ -163,6 +164,11 @@ require('dbConnect.php');
 					$reviews[$category_id]['public_count'] = count($reviews[$category_id]['public_review_ids']);
 					
 					}
+					
+					
+					//$all_user_ids = [];
+					//all_private_ids
+					//all_public_ids
 
 				}
 				
