@@ -44,19 +44,35 @@ require('dbConnect.php');
 			//FOR $privateReviews REVIEWS	
 			//a value in the contact_id column means a review is shared with a person, $user_name,
 			//who owns that number, $user_id
-			//the contact must be reciprocated for privateReviews to work
 			//we are joining the review_shared table with the category table, so we can instantly get the category name
-			//and then join thtta to contacts
-			$sql = "SELECT * FROM review_shared INNER JOIN category ON review_shared.cat_id = category.cat_id 
-			INNER JOIN contacts ON review_shared.contact_id = contacts.user_id 
-			WHERE review_shared.contact_id = ?";
-
+			$sql = "SELECT * FROM review_shared INNER JOIN category ON review_shared.cat_id = category.cat_id WHERE review_shared.contact_id = ?";
 			$stmt2 = $con->prepare($sql) or die(mysqli_error($con));
 			$stmt2->bind_param('i', $user_id) or die ("MySQLi-stmt binding failed ".$stmt2->error);
 			$stmt2->execute() or die ("MySQLi-stmt execute failed ".$stmt2->error);
 			
 			//this is for reviews by people who know current user, and shared with current user
-			$privateReviews = $stmt2->get_result();		
+			$privateReviews = $stmt2->get_result();
+			
+			while ($row = $privateReviews->fetch_assoc()) {
+				
+					//get the associated user_id, which we will call $contact_id
+					$contact_id = $row['user_id'];
+
+						$sql = "SELECT * FROM contacts WHERE user_id = ? AND contact_id = ?";
+			$stmt2 = $con->prepare($sql) or die(mysqli_error($con));
+			$stmt2->bind_param('ii', $contact_id, $user_id) or die ("MySQLi-stmt binding failed ".$stmt2->error);
+			$stmt2->execute() or die ("MySQLi-stmt execute failed ".$stmt2->error);
+			$result2 = $stmt2->get_result();
+			
+			while ($row = $result2->fetch_assoc()) {
+							//get the corresponding cat_id in the row
+							//this is the matching cat_id in the category table of cat_name
+							//$last_id = $row["cat_id"]; 
+							echo "the category does indeed exist baby" . "\n";
+							//echo $user_id;
+								}
+			
+			}			
 			
 			//FOR $publicReviews REVIEWS	
 			//select all rows where public_or_private column = 2 in review table

@@ -4,6 +4,11 @@
 	//reviewidprivate from the APP will be a string like 3,12,34
 	//explode it, break it into individual strings between the commas
 	$PrivateReviewID = $_POST['reviewidprivate'];
+	
+	//if explodable, like 3,12,34...
+	if(strpos ($PrivateReviewID, ",") !== false) {
+	
+	
     $PrivateReviewID = explode(",",$PrivateReviewID);
 
 	//for private_review_ids
@@ -31,6 +36,7 @@
             );
         }
     }
+	}
 	
 	    $combinedResults = array('private_review_ids' => $results2);
     echo json_encode($combinedResults);

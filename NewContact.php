@@ -15,7 +15,7 @@
 				// check the username in the user table and get the matching user_id
 				$query2 = "SELECT * FROM user WHERE username = ?";
 				$stmt2 = $con->prepare($query2) or die(mysqli_error($con));
-				$stmt2->bind_param('s', $Number) or die ("MySQLi-stmt binding failed ".$stmt2->error);
+				$stmt2->bind_param('s', $Number) or die ("MySQLi-stmt binding failed 1 ".$stmt2->error);
 				$stmt2->execute() or die ("MySQLi-stmt execute failed ".$stmt2->error);
 			    $result2 = $stmt2->get_result();
 				
@@ -43,7 +43,7 @@
 				$query = "SELECT * FROM category WHERE cat_name = ?";
 				$stmt = $con->prepare($query) or die(mysqli_error($con));
 				$stmt->bind_param('s', $category) or die ("MySQLi-stmt binding failed ".$stmt->error);
-				$stmt->execute() or die ("MySQLi-stmt execute failed ".$stmt->error);
+				$stmt->execute() or die ("MySQLi-stmt execute failed 2 ".$stmt->error);
 			    $result = $stmt->get_result();
 			
 			   //if the category is not already in the category table, then put it in there.
@@ -56,7 +56,7 @@
 			    If ($result->num_rows == 0) {
 							$stmt3 = $con->prepare("INSERT INTO category (cat_name, user_id) VALUES(?,?)") or die(mysqli_error($con));
 							$stmt3->bind_param('si', $category, $user_id) or die ("MySQLi-stmt binding failed ".$stmt3->error);
-							$stmt3->execute() or die ("MySQLi-stmt execute failed ".$stmt3->error);
+							$stmt3->execute() or die ("MySQLi-stmt execute failed 3 ".$stmt3->error);
 							//last_id is the last AUTO_INCREMENT id inserted into the category table; that is, cat_id
 							$last_id = $con->insert_id;
 							echo "the category doesn't exist" . "\n";
@@ -71,7 +71,7 @@
 							$query4 = "SELECT * FROM category WHERE cat_name = ?";
 							$stmt4 = $con->prepare($query4) or die(mysqli_error($con));
 							$stmt4->bind_param('s', $category) or die ("MySQLi-stmt binding failed ".$stmt4->error);
-							$stmt4->execute() or die ("MySQLi-stmt execute failed ".$stmt4->error);
+							$stmt4->execute() or die ("MySQLi-stmt execute failed 4 ".$stmt4->error);
 							$result4 = $stmt4->get_result();
 				
 							while ($row = $result4->fetch_assoc()) {
@@ -101,7 +101,7 @@
 					
 					$stmt = $con->prepare("INSERT INTO review (cat_id, cat_name, user_id, name, phone, address, comment, public_or_private ) VALUES(?,?,?,?,?,?,?,?)") or die(mysqli_error($con));
 					$stmt->bind_param('isissssi', $last_id, $category, $user_id, $name, $phone, $address, $comment,$public_or_private) or die ("MySQLi-stmt binding failed ".$stmt->error);
-					$stmt->execute() or die ("MySQLi-stmt execute failed ".$stmt->error); 
+					$stmt->execute() or die ("MySQLi-stmt execute failed 5 ".$stmt->error); 
 					//last_id2 is the last AUTO_INCREMENT id inserted into the review table; that is, review_id
 					$last_id2 = $con->insert_id;
 		
@@ -141,7 +141,7 @@
 								$query5 = "SELECT * FROM user WHERE username = ?";
 								$stmt5 = $con->prepare($query5) or die(mysqli_error($con));
 								$stmt5->bind_param('s', $checkedContact) or die ("Binding failed on $checkedContact ".$stmt5->error);
-								$stmt5->execute() or die ("MySQLi-stmt execute failed ".$stmt5->error);
+								$stmt5->execute() or die ("MySQLi-stmt execute failed 6 ".$stmt5->error);
 								$result5 = $stmt5->get_result();
 				
 								while ($row = $result5->fetch_assoc()) {
@@ -155,7 +155,7 @@
 			
 					$stmt3 = $con->prepare("INSERT INTO review_shared (cat_id, review_id, user_id, contact_id, username) VALUES(?,?,?,?,?)") or die(mysqli_error($con));
 					$stmt3->bind_param('iiiis', $last_id, $last_id2, $user_id, $contact_id,$checkedContact) or die ("MySQLi-stmt binding failed ".$stmt3->error);
-					$stmt3->execute() or die ("MySQLi-stmt execute failed ".$stmt3->error);
+					$stmt3->execute() or die ("MySQLi-stmt execute failed. Problem is in New Contact".$stmt3->error);
 					}
 
 			
