@@ -32,7 +32,8 @@
 				//If no, create the category in the category table and then put it into the review table.
 
 				//received from app
-				$category = $_POST["category"];
+				//force the category to be saved with first letter capital
+				$category = ucfirst($_POST["category"]);
 
 				// The ? below are parameter markers used for variable binding
 				// AUTO_INCREMENT does not need prepared statements

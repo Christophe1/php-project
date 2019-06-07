@@ -75,7 +75,7 @@ $array = json_decode($json);
 			 
 			}
 			 
-			   //Check if the number in the user's phone contacts is in the contacts table. 
+			   //Check if the number in the logged-in user's phone contacts is in the contacts table. 
 			   //We use this for updating contacts who
 			   //who may have been added or deleted into user's contacts phone book since the last time using the app
 				$query3 = "SELECT * FROM contacts WHERE user_id = ? AND contact_id = ?";
@@ -94,12 +94,28 @@ $array = json_decode($json);
 				$stmt4->close();
 			
 				}
+					
+				//For reviews of contacts of logged-in user, check also if 
+				//logged-in user is a contact of that contact in the contacts table.
+				//has to be a two way relationship
+			    //logged-in user is a contact in the review_shared table		
+			
+				$query3 = "SELECT * FROM contacts WHERE user_id = ? AND contact_id = ?";
+				if ($stmt3 = $con->prepare($query3) or die(mysqli_error($con))) {
+				$stmt3->bind_param('ii', $contact_id, $user_id) or die ("MySQLi-stmt binding failed ".$stmt3->error);
+				$stmt3->execute() or die ("MySQLi-stmt execute failed ".$stmt3->error);
+			    $result3 = $stmt3->get_result();
+			    $stmt3->close();
+				}
 				
-				//Make sure public reviews of contacts are visible to the logged-in user.
-			//(We need to do this because, if logged-in user is in mobile phone as a contact, and logged-in user
-			//has downloaded the app after contact has made the review 'public', they will not be checked for that review )
-			//CHECK REVIEW TABLE FOR reviews made by contacts of the logged-in user, get the
-			//public (public_or_private = 2) ones
+				//if yes...
+				If ($result3->num_rows > 0) {
+				
+				//Make sure public reviews of contacts are visible to the logged-in user, as contacts.
+				//(We need to do this because, if logged-in user is in mobile phone as a contact, and logged-in user
+				//has downloaded the app after contact has made the review 'public', they will not be checked for that review )
+				//CHECK REVIEW TABLE FOR reviews made by contacts of the logged-in user, get the
+				//public (public_or_private = 2) ones
 				$query6 = "SELECT * FROM review WHERE public_or_private = 2 AND user_id = ?";
 				$stmt6 = $con->prepare($query6) or die(mysqli_error($con));
 				$stmt6->bind_param('i', $contact_id) or die ("MySQLi-stmt binding failedd ".$stmt6->error);
@@ -115,7 +131,7 @@ $array = json_decode($json);
 					
 					//get the associated cat_id column value
 					$cat_id = $row['cat_id'];
-				
+							
 			//For reviews of contacts of logged-in user that are public in review table, check if 
 			//logged-in user is a contact, in the review_shared table
 				$query8 = "SELECT * FROM review_shared WHERE review_id = ? AND user_id = ? AND contact_id = ?";
@@ -125,6 +141,7 @@ $array = json_decode($json);
 			    $result8 = $stmt8->get_result();
 			    $stmt8->close();
 				
+				//if not...
 				If ($result8->num_rows == 0) {
 									
 				//If the logged-in user is not already in the contact_id column of the review_shared table, for that particluar review_id, then put him in the review_shared table
@@ -134,11 +151,26 @@ $array = json_decode($json);
 				$stmt9->close();    
 				}
 				
-				}     //end of while 2. 
+				} //end of while 2. 
+				
+				}
+				
+				
+				If ($result3->num_rows == 0) {
+				
+				//also delete contacts in review_shared
+				$query5a = "DELETE FROM review_shared WHERE user_id = ? AND contact_id <> ?";
+				$stmt5a = $con->prepare($query5a) or die(mysqli_error($con));
+				$stmt5a->bind_param('ii', $user_id, $user_id) or die ("MySQLi-stmt binding failed ".$stmt5a->error);
+				$stmt5a->execute() or die ("MySQLi-stmt execute failed 8".$stmt5a->error);
+				$stmt5a->close();
+				
+				
+				}     
 				
 				
 				
-			//SITUATION: In username's phone, for his public reviews, we want his contacts 
+			//SITUATION: In logged-in username's phone, for his public reviews, we want his contacts 
 			//to be checked, not empty. This can happen if a review is made before a contact 
 			//downloads Populisto.
 			//So we need to add this contact to the review_shared table.

@@ -23,8 +23,24 @@ require('dbConnect.php');
 				//here is the user_id, which is the corresponding user_id for username +353864677745
 				//echo $user_id;
 				}
+				
+				//we need this statement so we can get $contact_id
+			$query1 = "SELECT * FROM contacts WHERE user_id = ?";
+			$stmt1 = $con->prepare($query1) or die(mysqli_error($con));
+			$stmt1->bind_param('i', $user_id) or die ("MySQLi-stmt binding failed ".$stmt1->error);
+			$stmt1->execute() or die ("MySQLi-stmt execute failed ".$stmt1->error);
+			$result1 = $stmt1->get_result();
 
-
+				//fetch all rows associated with the value +353864677745
+				while ($row = $result1->fetch_assoc()) {
+				//for the user_id row associated with user_name +353864677745, call it $user_id
+				$contact_id = $row["contact_id"];
+			
+				//here is the user_id, which is the corresponding user_id for username +353864677745
+				//echo $contact_id;
+				}
+				
+				
 			//here is the user_id, which is the corresponding user_id for username +5555555
 
 			//$user_id = "21";
@@ -32,31 +48,52 @@ require('dbConnect.php');
 			//where the contact_id column is equal to $user_id.
 			
 			//FOR $userPersonalReviews REVIEWS
-			//where user_id = contactd_id
+			//where user_id = contact_id
 			$sql = "SELECT * FROM review_shared INNER JOIN category ON review_shared.cat_id = category.cat_id WHERE review_shared.user_id = ? AND review_shared.contact_id = ?";
 			$stmt2 = $con->prepare($sql) or die(mysqli_error($con));
 			$stmt2->bind_param('ii', $user_id,$user_id) or die ("MySQLi-stmt binding failed ".$stmt2->error);
 			$stmt2->execute() or die ("MySQLi-stmt execute failed ".$stmt2->error);
 			
-			//this is for reviews that current user has made
+			//this is for reviews that logged-in user has made
 			$userPersonalReviews = $stmt2->get_result();
+			
 				
-			//FOR $privateReviews REVIEWS	
+			//********** PRIVATE REVIEWS *****************
+			
 			//a value in the contact_id column means a review is shared with a person, $user_name,
 			//who owns that number, $user_id
 			//the contact must be reciprocated for privateReviews to work
 			//we are joining the review_shared table with the category table, so we can instantly get the category name
-			//and then join thtta to contacts
-			$sql = "SELECT * FROM review_shared INNER JOIN category ON review_shared.cat_id = category.cat_id 
+			//and then join that to contacts
+			
+ 			$sql = "SELECT * FROM review_shared INNER JOIN category ON review_shared.cat_id = category.cat_id 
 			INNER JOIN contacts ON review_shared.contact_id = contacts.user_id 
-			WHERE review_shared.contact_id = ?";
-
+			WHERE review_shared.contact_id = ?"; 
+			
 			$stmt2 = $con->prepare($sql) or die(mysqli_error($con));
 			$stmt2->bind_param('i', $user_id) or die ("MySQLi-stmt binding failed ".$stmt2->error);
+			//$stmt2->bind_param('i', $contact_id) or die ("MySQLi-stmt binding failed ".$stmt2->error);
 			$stmt2->execute() or die ("MySQLi-stmt execute failed ".$stmt2->error);
 			
-			//this is for reviews by people who know current user, and shared with current user
-			$privateReviews = $stmt2->get_result();		
+			//the above is for reviews by people who know logged-in user, and shared with logged-in user
+			$privateReviews[] = $stmt2->get_result();
+			
+			$sql2 = "SELECT * FROM review_shared INNER JOIN category ON review_shared.cat_id = category.cat_id 
+			INNER JOIN contacts ON contacts.user_id INNER JOIN review
+			WHERE review_shared.contact_id = ? AND review.public_or_private = 2"; 
+			
+						//$sql = "SELECT * FROM review_shared INNER JOIN category ON review_shared.cat_id = category.cat_id WHERE //contacts.user_id = ?";
+
+			$stmt3 = $con->prepare($sql2) or die(mysqli_error($con));
+			$stmt3->bind_param('i', $contact_id) or die ("MySQLi-stmt binding failed ".$stmt3->error);
+			//$stmt2->bind_param('i', $contact_id) or die ("MySQLi-stmt binding failed ".$stmt2->error);
+			$stmt3->execute() or die ("MySQLi-stmt execute failed ".$stmt3->error);
+			
+			//the above is for reviews by people who know logged-in user, and shared with logged-in user
+			$privateReviews[] = $stmt3->get_result();
+			//echo "monkey";
+						
+			//************ PUBLIC REVIEWS **********************
 			
 			//FOR $publicReviews REVIEWS	
 			//select all rows where public_or_private column = 2 in review table
@@ -65,6 +102,9 @@ require('dbConnect.php');
 			
 			//these are pubic reviews
 			$publicReviews =  mysqli_query($con,$sql2);
+	
+
+			
 			
 			// Prepare combined reviews array
 			$reviews = [];
@@ -94,7 +134,8 @@ require('dbConnect.php');
 				//echo "<br> private_review_ids values :";
 
 			    //Iterate through private review results and append to combined reviews
-				while (($row = $privateReviews->fetch_assoc())) {
+				for($i = 0; $i < 2; $i++){
+				while (($row = $privateReviews[$i] ->fetch_assoc())) {
 				$category_id = $row['cat_name'];
 			
 				$review_id = $row['review_id'];
@@ -104,7 +145,7 @@ require('dbConnect.php');
 				//"public_review_ids":[INT,],"user_personal_count":INT,"private_count":INT,"public_count":INT}
 				$reviews[$category_id]['cat_name'] = $category_id;
 
-					//if nothing has been set for user_personal_review_ids
+					//if nothing has been set for user_review_ids
 					//then set it to be an empty array
 					if (! isset($reviews[$category_id]['user_review_ids'])) {
 					$reviews[$category_id]['user_review_ids'] = [];
@@ -113,7 +154,7 @@ require('dbConnect.php');
 					$reviews[$category_id]['public_count'] = count($reviews[$category_id]['public_review_ids']);					
 					}
 					
-					//if the review has not already been placed in the user_personal_review_ids array
+					//if the review has not already been placed in the user_review_ids array
 					//then put it in private_review_ids array
 					if (! in_array($review_id, $reviews[$category_id]['user_review_ids'])) {
 					//$reviews[$category_id]['user_review_ids'] = [];
@@ -126,7 +167,7 @@ require('dbConnect.php');
 					
 					//echo json_encode($reviews[$category_id]['private_review_ids']);
 				}
-
+				}
 				// Iterate through public review results and append to combined reviews
 				while (($row = $publicReviews->fetch_assoc())) {
 				$category_id = $row['cat_name'];
@@ -176,7 +217,8 @@ require('dbConnect.php');
 				}
 				
             //make $reviews into a JSON Array
-			//echo "<br>";
+			//echo $contact_id;
+			
 			echo json_encode(array_values($reviews)); 
 
 ?>
