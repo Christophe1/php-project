@@ -63,25 +63,28 @@ require('dbConnect.php');
 			//a value in the contact_id column of REVIEW_SHARED table means a review has been shared with 
 			//the logged-in user, $user_id. So any review made by contact_id in this column will
 			//appear to logged-in user as (1,0)
-			//(in this case the contact must be reciprocated for privateReviews to work)
+			//(in this case the contact must be reciprocated for privateReviews to work, for logged-in user
+			//to see review as private he must be a contact in review makers's phone book)
 			//we are joining the review_shared table with the category table, so we can instantly get the category name
 			//and then join that to contacts
 			
-    		$sql = "SELECT * FROM review_shared INNER JOIN category ON review_shared.cat_id = category.cat_id 
-			INNER JOIN contacts ON review_shared.contact_id = contacts.user_id 
+      		$sql = "SELECT * FROM review_shared INNER JOIN category ON review_shared.cat_id = category.cat_id 
+			INNER JOIN contacts ON review_shared.contact_id = contacts.user_id and (contacts.user_id, contacts.contact_id) in (
+			select contacts.contact_id, contacts.user_id from contacts)
 			WHERE review_shared.contact_id = ?";  
 			
 			$stmt2 = $con->prepare($sql) or die(mysqli_error($con));
 			$stmt2->bind_param('i', $user_id) or die ("MySQLi-stmt binding failed ".$stmt2->error);
 			//$stmt2->bind_param('i', $contact_id) or die ("MySQLi-stmt binding failed ".$stmt2->error);
-			$stmt2->execute() or die ("MySQLi-stmt execute failed ".$stmt2->error);
+			$stmt2->execute() or die ("MySQLi-stmt execute failed ".$stmt2->error); 
 			
 			//the above is for contacts who have shared review with logged-in user, and logged-in user also has them as contact on //their phone.
 			$privateReviews[] = $stmt2->get_result();  
+			//$privateReviews = $stmt2->get_result();   
 			 
 			//this is to cover the (1,0) scenario where logged-in user has a contact in their phone book but that contact does
 			//not have logged-in user in their phonebook, and the contact's review is public. We want it to appear as (1,0)
-			 $sql2 =  "SELECT *
+    			 $sql2 =  "SELECT *
 			FROM contacts INNER JOIN review on review.user_id = contacts.contact_id 
 			where contacts.user_id = ?
 			and (contacts.user_id, contacts.contact_id) not in (
@@ -91,9 +94,11 @@ require('dbConnect.php');
 			$stmt3->bind_param('i', $user_id) or die ("MySQLi-stmt binding failed ".$stmt3->error);
 			$stmt3->execute() or die ("MySQLi-stmt execute failed ".$stmt3->error);
 			
-			//the above is for reviews by people who know logged-in user, and shared with logged-in user
-			$privateReviews[] = $stmt3->get_result(); 
-			//echo "monkey";
+			$privateReviews[] = $stmt3->get_result();  
+			 
+			//echo "monkey"; 
+						//$privateReviews = $stmt3->get_result();  
+
 						
 			//************ PUBLIC REVIEWS **********************
 			
@@ -141,8 +146,8 @@ require('dbConnect.php');
 				//echo "<br> private_review_ids values :";
 
 			    //Iterate through private review results and append to combined reviews
- 				for($i = 0; $i < 2; $i++){
-				while (($row = $privateReviews[$i] ->fetch_assoc())) { 
+  				for($i = 0; $i < 2; $i++){
+				while (($row = $privateReviews[$i] ->fetch_assoc())) {  
 				//while (($row = $privateReviews ->fetch_assoc())) {
 				$category_id = $row['cat_name'];
 			
