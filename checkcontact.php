@@ -1,8 +1,5 @@
-
 <?php
-
 require('dbConnect.php');
-
 //this is the username, the logged-in user, in the user table
 $Number = $_POST['phonenumberofuser'];
 //$Number = "+353872934480";
@@ -25,7 +22,6 @@ $Number = $_POST['phonenumberofuser'];
 $json = $_POST['phonenumberofcontact'];
 //decode the JSON into PHP language, will look something like ["username"] => "0871234567" etc
 $array = json_decode($json);
-
 //We want to get the corresponding user_id of the posted phone number
  $query = "SELECT * FROM user WHERE username = ?";
  //sanitize the query
@@ -40,10 +36,8 @@ $array = json_decode($json);
 	foreach ($array as $value)
 	{
 		$phonenumberofcontact = $value->phone_number;
-
 		//get the usernames (phone numbers) that match phone numbers in our posted JSON, jsonArrayAllPhonesandNamesofContacts
 		$stmt2->execute() or die ("MySQLi-stmt execute failed ".$stmt2->error);
-
 		$result2 = $stmt2->get_result(); 
 		
 		//So, above, we will have our $results array - where there 
@@ -54,7 +48,7 @@ $array = json_decode($json);
 			//we want to get the corresponding user_ids in user table of usernames
 	        while ($row = $result2->fetch_assoc()) {    //while 1.
 				
-			//call this user_id contact_id
+			//call this user_id $contact_id
 			$contact_id = $row['user_id'];
 			
 			//foreach ($array as $value)... for each number in phone contacs (like 0872345678), 
@@ -66,7 +60,6 @@ $array = json_decode($json);
 			 //below we will delete these from the contacts table, if they don't exist in the most updated 
 			 //matching contacts.
 			 $contact_id_results[] = array('contact_id' => $contact_id);
-
 			 //$results of the matching usernames will be of the form [{"usernameMatch":"+123456"}, etc...]
 			 $results[] = array('usernameMatch' => $row['username']);
 			 
@@ -101,17 +94,35 @@ $array = json_decode($json);
 				$json4 = json_encode($contact_id_results);
 				//decode $json4, because our implode wasn't working otherwise
                 $json5 = json_decode($json4);				
-
 				//get the contact_id values as individual strings and call these $id_list
 			    $id_list = implode(",", array_map(function ($val) { return (int) $val->contact_id; }, $json5));
-
 				//delete any extra unnecessary contacts in the contacts table of logged-in user
-                $query5 = "DELETE FROM contacts WHERE user_id = ? AND contact_id NOT IN ($id_list)";
+                 $query5 = "DELETE FROM contacts WHERE user_id = ? AND contact_id NOT IN ($id_list)";
 				$stmt5 = $con->prepare($query5) or die(mysqli_error($con));
 				$stmt5->bind_param('i', $user_id) or die ("MySQLi-stmt binding failed ".$stmt5->error);
 				$stmt5->execute() or die ("MySQLi-stmt execute failed ".$stmt5->error);
-				$stmt5->close();
-					
+				
+				$stmt5->close(); 
+				
+									
+				//Objective:
+				//When logged-in user removes a contact from their phonebook, check the reveiw_shared table if that contact
+				//exists in the contact_id column for logged-in user and delete the relevant row 
+				
+				//delete any extra unnecessary contacts from review_shared table of logged-in user, except logged-in user's own contact_id
+/*               $query6 = "DELETE FROM review_shared WHERE user_id = ? AND contact_id <> ? AND contact_id <> ?";
+				$stmt6 = $con->prepare($query6) or die(mysqli_error($con));
+				$stmt6->bind_param('iii', $user_id, $contact_id, $user_id) or die ("MySQLi-stmt binding failed ".$stmt6->error);
+				$stmt6->execute() or die ("MySQLi-stmt execute failed ".$stmt6->error);
+				//$rc = mysql_affected_rows();
+				$stmt6->close(); */   
+				
+				//delete any extra unnecessary contacts from review_shared table of logged-in user, except logged-in user's own contact_id
+                   $query6 = "DELETE FROM review_shared WHERE user_id = ? AND contact_id NOT IN ($id_list) AND contact_id <> ?";
+				$stmt6 = $con->prepare($query6) or die(mysqli_error($con));
+				$stmt6->bind_param('ii', $user_id, $user_id) or die ("MySQLi-stmt binding failed ".$stmt6->error);
+				$stmt6->execute() or die ("MySQLi-stmt execute failed ".$stmt6->error);
+				$stmt6->close();   
 					
 				//For reviews of contacts of logged-in user, check also if 
 				//logged-in user is a contact of that contact in the contacts table.
@@ -160,7 +171,8 @@ $array = json_decode($json);
 				//if not...
 				If ($result8->num_rows == 0) {
 									
-				//If the logged-in user is not already in the contact_id column of the review_shared table, for that particluar review_id, then put him in the review_shared table
+				//If the logged-in user is not already in the contact_id column of the review_shared table, 
+				//for that particluar review_id, then put him in the review_shared table
    	 			$stmt9 = $con->prepare("INSERT INTO review_shared (cat_id, review_id, user_id, contact_id, username) VALUES(?,?,?,?,?)") or die(mysqli_error($con));
 				$stmt9->bind_param('iiiis', $cat_id, $review_id, $contact_id, $user_id, $Number) or die ("MySQLi-stmt binding failed ".$stmt9->error);
 				$stmt9->execute() or die ("MySQLi-stmt execute failed ".$stmt9->error);
@@ -222,9 +234,7 @@ $array = json_decode($json);
 			    $stmt11->close();
 				
 				If ($result11->num_rows == 0) {
-									
-				//((If the logged-in user is not already in the contact_id column of the review_shared table, for that particluar review_id, then put him in the review_shared table))
-				
+													
 				//((If the contact is not already in the contact_id column of the review_shared table, for that particluar review_id, then put him in the review_shared table))
    	 			$stmt12 = $con->prepare("INSERT INTO review_shared (cat_id, review_id, user_id, contact_id, username) VALUES(?,?,?,?,?)") or die(mysqli_error($con));
 				$stmt12->bind_param('iiiis', $cat_id, $review_id, $user_id, $contact_id, $phonenumberofcontact) or die ("MySQLi-stmt binding failed3 ".$stmt12->error);
@@ -234,18 +244,17 @@ $array = json_decode($json);
 				
 				}  //end of while 3
 				  
-				
+ 				
 				//delete any extra unnecessary contacts from review_shared table of logged-in user, except logged-in user's own contact_id
-                $query6 = "DELETE FROM review_shared WHERE user_id = ? AND contact_id NOT IN ($id_list) AND contact_id <> ?";
+/*                 $query6 = "DELETE FROM review_shared WHERE user_id = ? AND contact_id NOT IN ($id_list) AND contact_id <> ?";
 				$stmt6 = $con->prepare($query6) or die(mysqli_error($con));
 				$stmt6->bind_param('ii', $user_id, $user_id) or die ("MySQLi-stmt binding failed ".$stmt6->error);
 				$stmt6->execute() or die ("MySQLi-stmt execute failed ".$stmt6->error);
 				$stmt6->close();   
-				
+				  */
 				
 								}     //end of while 1. 
 								
-
 			}
 			
 			
@@ -272,14 +281,12 @@ $array = json_decode($json);
 				$stmt5a->close();
 					
  			} 
-			
-			echo json_encode($results);	
-			//echo "result 10 is " . $result10;
+			echo  $id_list;
+			//echo json_encode($results);	
+			//echo "Records deleted: " //. $rc;
 			
 			
 		   
 $stmt->close();
 $stmt2->close();
 		?>
-
-		

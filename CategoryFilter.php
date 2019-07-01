@@ -105,15 +105,22 @@ require('dbConnect.php');
 			//FOR $publicReviews REVIEWS	
 			//select all rows where public_or_private column = 2 in review table
 			//we are joining with the category table, so we can instantly get the category name
-			$sql2 = "SELECT * FROM review INNER JOIN category ON review.cat_id = category.cat_id 
+/* 			$sql2 = "SELECT * FROM review INNER JOIN category ON review.cat_id = category.cat_id 
 			INNER JOIN contacts ON contacts.contact_id WHERE contacts.user_id <> ? AND contacts.contact_id <> ?  AND
-			review.public_or_private = 2";  
+			review.public_or_private = 2";   */
 			
-			$stmt3 = $con->prepare($sql2) or die(mysqli_error($con));
-			$stmt3->bind_param('ii', $contact_id, $user_id) or die ("MySQLi-stmt binding failed ".$stmt3->error);
+			$sql2 = "SELECT * FROM review INNER JOIN category ON review.cat_id = category.cat_id
+            WHERE review.public_or_private = 2 AND NOT EXISTS(SELECT * FROM contacts WHERE contacts.user_id = ? AND contacts.contact_id = category.user_id)
+			";
+			
+ 			$stmt3 = $con->prepare($sql2) or die(mysqli_error($con));
+			$stmt3->bind_param('i', $user_id) or die ("MySQLi-stmt binding failed ".$stmt3->error);
 			$stmt3->execute() or die ("MySQLi-stmt execute failed ".$stmt3->error);
-			
-			$publicReviews = $stmt3->get_result();
+			 
+			 
+			 $publicReviews = $stmt3->get_result();
+			 
+			//$publicReviews =  mysqli_query($con,$sql2);
 			
 			//these are pubic reviews
 			//$publicReviews =  mysqli_query($con,$sql2);
